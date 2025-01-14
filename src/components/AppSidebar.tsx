@@ -110,26 +110,35 @@ export function AppSidebar() {
       <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
         {menuItems.map((item) => (
           <div key={item.href} className="space-y-1">
-            <button
-              onClick={() => handleMenuClick(item.label)}
-              className={cn(
-                "nav-link w-full",
-                expandedMenu === item.label && "bg-mint-50 text-mint-600"
-              )}
-            >
-              <item.icon className="h-5 w-5" />
-              <span className={cn("flex-1 text-left", collapsed ? "hidden" : "block")}>
-                {item.label}
-              </span>
-              {item.submenu && !collapsed && (
-                <ChevronRight
-                  className={cn(
-                    "h-4 w-4 transition-transform",
-                    expandedMenu === item.label && "rotate-90"
-                  )}
-                />
-              )}
-            </button>
+            {item.submenu ? (
+              <button
+                onClick={() => handleMenuClick(item.label)}
+                className={cn(
+                  "nav-link w-full",
+                  expandedMenu === item.label && "bg-mint-50 text-mint-600"
+                )}
+              >
+                <item.icon className="h-5 w-5" />
+                <span className={cn("flex-1 text-left", collapsed ? "hidden" : "block")}>
+                  {item.label}
+                </span>
+                {!collapsed && (
+                  <ChevronRight
+                    className={cn(
+                      "h-4 w-4 transition-transform",
+                      expandedMenu === item.label && "rotate-90"
+                    )}
+                  />
+                )}
+              </button>
+            ) : (
+              <Link to={item.href} className="nav-link">
+                <item.icon className="h-5 w-5" />
+                <span className={cn("flex-1", collapsed ? "hidden" : "block")}>
+                  {item.label}
+                </span>
+              </Link>
+            )}
 
             {item.submenu && expandedMenu === item.label && !collapsed && (
               <div className="ml-6 space-y-1">
