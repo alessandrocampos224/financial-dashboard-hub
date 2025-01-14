@@ -22,6 +22,8 @@ import PermissionsPage from "./pages/settings/permissions";
 import PermissionForm from "./pages/settings/permissions/form";
 import RolesPage from "./pages/settings/roles";
 import RoleForm from "./pages/settings/roles/form";
+import SalesListPage from "./pages/financial/sales/list";
+import SalesForm from "./pages/financial/sales/form";
 
 const queryClient = new QueryClient();
 
@@ -57,7 +59,9 @@ const App = () => {
                 <Route path="inventory/products/new" element={<ProductForm />} />
                 <Route path="inventory/products/:id/edit" element={<ProductForm />} />
                 <Route path="inventory/carriers" element={<CarriersPage />} />
-                <Route path="financial/sales" element={<SalesPage />} />
+                <Route path="financial/sales" element={<SalesListPage />} />
+                <Route path="financial/sales/new" element={<SalesForm />} />
+                <Route path="financial/sales/:id/edit" element={<SalesForm />} />
                 <Route path="operational/settings" element={<OperationalSettings />} />
                 <Route path="settings/users" element={<UsersPage />} />
                 <Route path="settings/users/new" element={<UserForm />} />
