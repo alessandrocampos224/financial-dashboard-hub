@@ -12,6 +12,8 @@ import BrandsPage from "./pages/inventory/brands";
 import ProductsPage from "./pages/inventory/products";
 import CarriersPage from "./pages/inventory/carriers";
 import OperationalSettings from "./pages/operational/settings";
+import UsersPage from "./pages/settings/users";
+import UserForm from "./pages/settings/users/form";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +45,9 @@ const App = () => (
               <Route path="inventory/products" element={<ProductsPage />} />
               <Route path="inventory/carriers" element={<CarriersPage />} />
               <Route path="operational/settings" element={<OperationalSettings />} />
+              <Route path="settings/users" element={<UsersPage />} />
+              <Route path="settings/users/new" element={<UserForm />} />
+              <Route path="settings/users/:id/edit" element={<UserForm />} />
             </Route>
           </Routes>
         </AuthProvider>
