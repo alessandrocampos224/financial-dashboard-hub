@@ -36,8 +36,8 @@ const menuItems = [
     href: "/settings",
     submenu: [
       { label: "Usuários", href: "/settings/users", icon: Users },
-      { label: "Roles", href: "/settings/roles", icon: Shield },
-      { label: "Permissions", href: "/settings/permissions", icon: Key },
+      { label: "Perfis", href: "/settings/roles", icon: Shield },
+      { label: "Permissões", href: "/settings/permissions", icon: Key },
     ],
   },
   {

@@ -16,6 +16,8 @@ import UsersPage from "./pages/settings/users";
 import UserForm from "./pages/settings/users/form";
 import PermissionsPage from "./pages/settings/permissions";
 import PermissionForm from "./pages/settings/permissions/form";
+import RolesPage from "./pages/settings/roles";
+import RoleForm from "./pages/settings/roles/form";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +54,9 @@ const App = () => {
                 <Route path="settings/permissions" element={<PermissionsPage />} />
                 <Route path="settings/permissions/new" element={<PermissionForm />} />
                 <Route path="settings/permissions/:id/edit" element={<PermissionForm />} />
+                <Route path="settings/roles" element={<RolesPage />} />
+                <Route path="settings/roles/new" element={<RoleForm />} />
+                <Route path="settings/roles/:id/edit" element={<RoleForm />} />
               </Route>
             </Routes>
             <Toaster />
