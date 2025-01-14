@@ -17,7 +17,8 @@ import {
   ShoppingCart,
   Receipt,
   Wallet,
-  Cog
+  Cog,
+  CreditCard
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SidebarHeader } from "./sidebar/SidebarHeader";
@@ -61,6 +62,7 @@ const menuItems = [
       { label: "Vendas", href: "/financial/sales", icon: ShoppingCart },
       { label: "Nota Fiscal", href: "/financial/invoices", icon: Receipt },
       { label: "Caixa", href: "/financial/cashier", icon: Wallet },
+      { label: "Pagamentos", href: "/financial/payments", icon: CreditCard },
     ],
   },
   {
