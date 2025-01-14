@@ -1,5 +1,6 @@
 import { Bell, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,6 +11,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export function Header() {
+  const { user, logout } = useAuth();
+
   return (
     <header className="h-16 border-b border-gray-200 bg-white/80 backdrop-blur-lg sticky top-0 z-50">
       <div className="h-full flex items-center justify-between px-6">
@@ -29,10 +32,16 @@ export function Header() {
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Perfil</DropdownMenuItem>
-              <DropdownMenuItem>Configurações</DropdownMenuItem>
+              <DropdownMenuItem>
+                {user?.name || "Usuário"}
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                {user?.email || "email@exemplo.com"}
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600">Sair</DropdownMenuItem>
+              <DropdownMenuItem onClick={logout} className="text-red-600">
+                Sair
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
