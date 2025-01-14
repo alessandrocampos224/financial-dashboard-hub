@@ -14,6 +14,7 @@ import BrandForm from "./pages/inventory/brands/form";
 import ProductsPage from "./pages/inventory/products";
 import ProductForm from "./pages/inventory/products/form";
 import CarriersPage from "./pages/inventory/carriers";
+import SalesPage from "./pages/financial/sales";
 import OperationalSettings from "./pages/operational/settings";
 import UsersPage from "./pages/settings/users";
 import UserForm from "./pages/settings/users/form";
@@ -56,6 +57,7 @@ const App = () => {
                 <Route path="inventory/products/new" element={<ProductForm />} />
                 <Route path="inventory/products/:id/edit" element={<ProductForm />} />
                 <Route path="inventory/carriers" element={<CarriersPage />} />
+                <Route path="financial/sales" element={<SalesPage />} />
                 <Route path="operational/settings" element={<OperationalSettings />} />
                 <Route path="settings/users" element={<UsersPage />} />
                 <Route path="settings/users/new" element={<UserForm />} />
