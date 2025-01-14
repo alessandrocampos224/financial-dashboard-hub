@@ -28,8 +28,9 @@ export function SidebarMenuItem({ item, collapsed, expandedMenu, handleMenuClick
         <button
           onClick={() => handleMenuClick(item.label)}
           className={cn(
-            "nav-link w-full",
-            expandedMenu === item.label && "bg-mint-50 text-mint-600"
+            "nav-link w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors",
+            "hover:bg-mint-50 hover:text-mint-600 dark:hover:bg-mint-900/10 dark:hover:text-mint-400",
+            expandedMenu === item.label && "bg-mint-50 text-mint-600 dark:bg-mint-900/10 dark:text-mint-400"
           )}
         >
           <item.icon className="h-5 w-5" />
@@ -46,7 +47,13 @@ export function SidebarMenuItem({ item, collapsed, expandedMenu, handleMenuClick
           )}
         </button>
       ) : (
-        <Link to={item.href} className="nav-link">
+        <Link 
+          to={item.href} 
+          className={cn(
+            "nav-link flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors",
+            "hover:bg-mint-50 hover:text-mint-600 dark:hover:bg-mint-900/10 dark:hover:text-mint-400"
+          )}
+        >
           <item.icon className="h-5 w-5" />
           <span className={cn("flex-1", collapsed ? "hidden" : "block")}>
             {item.label}
@@ -60,7 +67,10 @@ export function SidebarMenuItem({ item, collapsed, expandedMenu, handleMenuClick
             <Link
               key={subItem.href}
               to={subItem.href}
-              className="nav-link pl-6"
+              className={cn(
+                "nav-link flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                "hover:bg-mint-50 hover:text-mint-600 dark:hover:bg-mint-900/10 dark:hover:text-mint-400"
+              )}
             >
               <subItem.icon className="h-4 w-4" />
               <span>{subItem.label}</span>
