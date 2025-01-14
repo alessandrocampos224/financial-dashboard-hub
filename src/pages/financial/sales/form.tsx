@@ -1,47 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Search, X, Minus, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { Item } from "@/types/item";
 import { Product } from "@/types/product";
-
-// Mock customer data
-const mockCustomers = [
-  {
-    id: "1",
-    name: "John Doe",
-    email: "john@example.com",
-    document: "123.456.789-00",
-    type: "customer",
-    status: true,
-  },
-];
+import { CustomerSelector } from "./components/CustomerSelector";
+import { ProductSearch } from "./components/ProductSearch";
+import { OrderSummary } from "./components/OrderSummary";
 
 // Mock de produtos para exemplo
 const mockProducts: Product[] = [
@@ -68,13 +33,6 @@ export default function SalesForm() {
   const [isCustomerDialogOpen, setIsCustomerDialogOpen] = useState(false);
   const [items, setItems] = useState<Item[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-
-  const filteredCustomers = mockCustomers.filter(
-    (customer) =>
-      customer.type === "customer" &&
-      (customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        customer.document.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
 
   const filteredProducts = mockProducts.filter(
     (product) =>
@@ -160,213 +118,31 @@ export default function SalesForm() {
 
       <div className="space-y-6">
         <div className="flex items-center gap-4">
-          <Dialog open={isCustomerDialogOpen} onOpenChange={setIsCustomerDialogOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline">
-                {selectedCustomer ? (
-                  <>
-                    <span>{selectedCustomer.name}</span>
-                    <X
-                      className="ml-2 h-4 w-4"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedCustomer(null);
-                      }}
-                    />
-                  </>
-                ) : (
-                  <>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Selecionar Cliente
-                  </>
-                )}
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-3xl">
-              <DialogHeader>
-                <DialogTitle>Selecionar Cliente</DialogTitle>
-              </DialogHeader>
-              <div className="relative">
-                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar cliente por nome ou CPF/CNPJ..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-8"
-                />
-              </div>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Nome</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>CPF/CNPJ</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredCustomers.map((customer) => (
-                    <TableRow
-                      key={customer.id}
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => {
-                        setSelectedCustomer(customer);
-                        setIsCustomerDialogOpen(false);
-                      }}
-                    >
-                      <TableCell>{customer.name}</TableCell>
-                      <TableCell>{customer.email}</TableCell>
-                      <TableCell>{customer.document}</TableCell>
-                      <TableCell>
-                        <Badge variant={customer.status ? "default" : "destructive"}>
-                          {customer.status ? "Ativo" : "Inativo"}
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </DialogContent>
-          </Dialog>
+          <CustomerSelector
+            selectedCustomer={selectedCustomer}
+            setSelectedCustomer={setSelectedCustomer}
+            isCustomerDialogOpen={isCustomerDialogOpen}
+            setIsCustomerDialogOpen={setIsCustomerDialogOpen}
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+          />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Coluna da esquerda - Produtos */}
-          <Card className="p-4">
-            <div className="space-y-4">
-              <div className="relative">
-                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar produto por nome ou código..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-8"
-                />
-              </div>
+          <ProductSearch
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            filteredProducts={filteredProducts}
+            onProductSelect={addItem}
+          />
 
-              {searchTerm && (
-                <div className="border rounded-md mt-2">
-                  {filteredProducts.map((product) => (
-                    <div
-                      key={product.id}
-                      className="p-2 hover:bg-accent cursor-pointer flex justify-between items-center"
-                      onClick={() => addItem(product)}
-                    >
-                      <div>
-                        <p className="font-medium">{product.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {product.code}
-                        </p>
-                      </div>
-                      <p className="font-medium">
-                        {product.price.toLocaleString("pt-BR", {
-                          style: "currency",
-                          currency: "BRL",
-                        })}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </Card>
-
-          {/* Coluna da direita - Carrinho */}
-          <Card className="p-4">
-            <div className="space-y-4">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Produto</TableHead>
-                    <TableHead>Qtd</TableHead>
-                    <TableHead>Valor Unit.</TableHead>
-                    <TableHead>Total</TableHead>
-                    <TableHead>Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {items.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell>{item.product?.name}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center space-x-2">
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => updateQuantity(item.id, false)}
-                          >
-                            <Minus className="h-4 w-4" />
-                          </Button>
-                          <span>{item.quantity}</span>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => updateQuantity(item.id, true)}
-                          >
-                            <Plus className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {item.unitary?.toLocaleString("pt-BR", {
-                          style: "currency",
-                          currency: "BRL",
-                        })}
-                      </TableCell>
-                      <TableCell>
-                        {item.amount?.toLocaleString("pt-BR", {
-                          style: "currency",
-                          currency: "BRL",
-                        })}
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => removeItem(item.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-
-              <div className="border-t pt-4">
-                <div className="flex justify-between items-center mb-4">
-                  <span className="text-lg font-medium">Total do Pedido:</span>
-                  <span className="text-2xl font-bold">
-                    {total.toLocaleString("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    })}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Forma de Pagamento" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="money">Dinheiro</SelectItem>
-                      <SelectItem value="credit">Cartão de Crédito</SelectItem>
-                      <SelectItem value="debit">Cartão de Débito</SelectItem>
-                      <SelectItem value="pix">PIX</SelectItem>
-                    </SelectContent>
-                  </Select>
-
-                  <Button 
-                    className="w-full" 
-                    disabled={!selectedCustomer || items.length === 0}
-                  >
-                    Finalizar Venda
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </Card>
+          <OrderSummary
+            items={items}
+            updateQuantity={updateQuantity}
+            removeItem={removeItem}
+            total={total}
+            selectedCustomer={selectedCustomer}
+          />
         </div>
       </div>
     </div>
