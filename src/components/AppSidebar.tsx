@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   LayoutDashboard,
   Settings,
@@ -77,6 +78,7 @@ const menuItems = [
 export function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
+  const { logout } = useAuth();
 
   const handleMenuClick = (label: string) => {
     setExpandedMenu(expandedMenu === label ? null : label);
@@ -148,7 +150,7 @@ export function AppSidebar() {
       </nav>
 
       <div className="p-4 border-t border-gray-200">
-        <button className="nav-link w-full">
+        <button onClick={logout} className="nav-link w-full">
           <LogOut className="h-5 w-5" />
           <span className={cn("transition-opacity", collapsed ? "opacity-0 hidden" : "opacity-100")}>
             Sair
