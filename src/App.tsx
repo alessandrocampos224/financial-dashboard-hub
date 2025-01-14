@@ -24,41 +24,43 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
   return isAuthenticated ? children : <Navigate to="/login" />;
 }
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
+const App = () => {
+  return (
+    <BrowserRouter>
+      <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route
-              path="/"
-              element={
-                <PrivateRoute>
-                  <Index />
-                </PrivateRoute>
-              }
-            >
-              <Route path="inventory/taxes" element={<TaxesPage />} />
-              <Route path="inventory/categories" element={<CategoriesPage />} />
-              <Route path="inventory/brands" element={<BrandsPage />} />
-              <Route path="inventory/products" element={<ProductsPage />} />
-              <Route path="inventory/carriers" element={<CarriersPage />} />
-              <Route path="operational/settings" element={<OperationalSettings />} />
-              <Route path="settings/users" element={<UsersPage />} />
-              <Route path="settings/users/new" element={<UserForm />} />
-              <Route path="settings/users/:id/edit" element={<UserForm />} />
-              <Route path="settings/permissions" element={<PermissionsPage />} />
-              <Route path="settings/permissions/new" element={<PermissionForm />} />
-              <Route path="settings/permissions/:id/edit" element={<PermissionForm />} />
-            </Route>
-          </Routes>
+          <TooltipProvider>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route
+                path="/"
+                element={
+                  <PrivateRoute>
+                    <Index />
+                  </PrivateRoute>
+                }
+              >
+                <Route path="inventory/taxes" element={<TaxesPage />} />
+                <Route path="inventory/categories" element={<CategoriesPage />} />
+                <Route path="inventory/brands" element={<BrandsPage />} />
+                <Route path="inventory/products" element={<ProductsPage />} />
+                <Route path="inventory/carriers" element={<CarriersPage />} />
+                <Route path="operational/settings" element={<OperationalSettings />} />
+                <Route path="settings/users" element={<UsersPage />} />
+                <Route path="settings/users/new" element={<UserForm />} />
+                <Route path="settings/users/:id/edit" element={<UserForm />} />
+                <Route path="settings/permissions" element={<PermissionsPage />} />
+                <Route path="settings/permissions/new" element={<PermissionForm />} />
+                <Route path="settings/permissions/:id/edit" element={<PermissionForm />} />
+              </Route>
+            </Routes>
+            <Toaster />
+            <Sonner />
+          </TooltipProvider>
         </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+      </QueryClientProvider>
+    </BrowserRouter>
+  );
+};
 
 export default App;
