@@ -15,6 +15,12 @@ import ProductsPage from "./pages/inventory/products";
 import ProductForm from "./pages/inventory/products/form";
 import CarriersPage from "./pages/inventory/carriers";
 import SalesPage from "./pages/financial/sales";
+import SalesListPage from "./pages/financial/sales/list";
+import SalesForm from "./pages/financial/sales/form";
+import SalesViewPage from "./pages/financial/sales/view";
+import CashierPage from "./pages/financial/cashier";
+import PaymentsPage from "./pages/financial/payments";
+import PaymentForm from "./pages/financial/payments/form";
 import OperationalSettings from "./pages/operational/settings";
 import UsersPage from "./pages/settings/users";
 import UserForm from "./pages/settings/users/form";
@@ -22,11 +28,6 @@ import PermissionsPage from "./pages/settings/permissions";
 import PermissionForm from "./pages/settings/permissions/form";
 import RolesPage from "./pages/settings/roles";
 import RoleForm from "./pages/settings/roles/form";
-import SalesListPage from "./pages/financial/sales/list";
-import SalesForm from "./pages/financial/sales/form";
-import CashierPage from "./pages/financial/cashier";
-import PaymentsPage from "./pages/financial/payments";
-import PaymentForm from "./pages/financial/payments/form";
 
 const queryClient = new QueryClient();
 
@@ -64,6 +65,7 @@ const App = () => {
                 <Route path="inventory/carriers" element={<CarriersPage />} />
                 <Route path="financial/sales" element={<SalesListPage />} />
                 <Route path="financial/sales/new" element={<SalesForm />} />
+                <Route path="financial/sales/:id" element={<SalesViewPage />} />
                 <Route path="financial/sales/:id/edit" element={<SalesForm />} />
                 <Route path="financial/cashier" element={<CashierPage />} />
                 <Route path="financial/payments" element={<PaymentsPage />} />
