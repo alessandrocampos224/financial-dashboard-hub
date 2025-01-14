@@ -16,7 +16,7 @@ export function Header() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <header className="h-16 border-b border-gray-200 dark:border-gray-800 bg-background/80 backdrop-blur-lg sticky top-0 z-50">
+    <header className="h-16 border-b border-border bg-background/80 backdrop-blur-lg sticky top-0 z-50">
       <div className="h-full flex items-center justify-between px-6">
         <h2 className="text-xl font-semibold text-foreground">IDEAL COMUNICAÇÃO VISUAL LTDA ME</h2>
         
