@@ -2,6 +2,7 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { Header } from "@/components/Header";
 import { Card } from "@/components/ui/card";
 import { ArrowUpRight, ArrowDownRight, DollarSign, ShoppingCart } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function Index() {
   const stats = [
