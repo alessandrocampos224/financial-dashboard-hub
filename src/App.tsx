@@ -24,6 +24,7 @@ import RolesPage from "./pages/settings/roles";
 import RoleForm from "./pages/settings/roles/form";
 import SalesListPage from "./pages/financial/sales/list";
 import SalesForm from "./pages/financial/sales/form";
+import CashierPage from "./pages/financial/cashier";
 
 const queryClient = new QueryClient();
 
@@ -62,6 +63,7 @@ const App = () => {
                 <Route path="financial/sales" element={<SalesListPage />} />
                 <Route path="financial/sales/new" element={<SalesForm />} />
                 <Route path="financial/sales/:id/edit" element={<SalesForm />} />
+                <Route path="financial/cashier" element={<CashierPage />} />
                 <Route path="operational/settings" element={<OperationalSettings />} />
                 <Route path="settings/users" element={<UsersPage />} />
                 <Route path="settings/users/new" element={<UserForm />} />
