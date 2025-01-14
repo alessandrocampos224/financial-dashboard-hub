@@ -14,6 +14,8 @@ import CarriersPage from "./pages/inventory/carriers";
 import OperationalSettings from "./pages/operational/settings";
 import UsersPage from "./pages/settings/users";
 import UserForm from "./pages/settings/users/form";
+import PermissionsPage from "./pages/settings/permissions";
+import PermissionForm from "./pages/settings/permissions/form";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +50,9 @@ const App = () => (
               <Route path="settings/users" element={<UsersPage />} />
               <Route path="settings/users/new" element={<UserForm />} />
               <Route path="settings/users/:id/edit" element={<UserForm />} />
+              <Route path="settings/permissions" element={<PermissionsPage />} />
+              <Route path="settings/permissions/new" element={<PermissionForm />} />
+              <Route path="settings/permissions/:id/edit" element={<PermissionForm />} />
             </Route>
           </Routes>
         </AuthProvider>
