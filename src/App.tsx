@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ThemeProvider } from "next-themes";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import TaxesPage from "./pages/inventory/taxes";
@@ -39,11 +40,12 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 
 const App = () => {
   return (
-    <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <TooltipProvider>
-            <Routes>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <BrowserRouter>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <TooltipProvider>
+              <Routes>
               <Route path="/login" element={<Login />} />
               <Route
                 path="/"
@@ -85,13 +87,14 @@ const App = () => {
                 <Route path="settings/roles/new" element={<RoleForm />} />
                 <Route path="settings/roles/:id/edit" element={<RoleForm />} />
               </Route>
-            </Routes>
-            <Toaster />
-            <Sonner />
-          </TooltipProvider>
-        </AuthProvider>
-      </QueryClientProvider>
-    </BrowserRouter>
+              </Routes>
+              <Toaster />
+              <Sonner />
+            </TooltipProvider>
+          </AuthProvider>
+        </QueryClientProvider>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 };
 
