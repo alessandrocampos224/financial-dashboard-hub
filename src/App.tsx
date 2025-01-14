@@ -44,8 +44,14 @@ const App = () => {
               >
                 <Route path="inventory/taxes" element={<TaxesPage />} />
                 <Route path="inventory/categories" element={<CategoriesPage />} />
+                <Route path="inventory/categories/new" element={<CategoryForm />} />
+                <Route path="inventory/categories/:id/edit" element={<CategoryForm />} />
                 <Route path="inventory/brands" element={<BrandsPage />} />
+                <Route path="inventory/brands/new" element={<BrandForm />} />
+                <Route path="inventory/brands/:id/edit" element={<BrandForm />} />
                 <Route path="inventory/products" element={<ProductsPage />} />
+                <Route path="inventory/products/new" element={<ProductForm />} />
+                <Route path="inventory/products/:id/edit" element={<ProductForm />} />
                 <Route path="inventory/carriers" element={<CarriersPage />} />
                 <Route path="operational/settings" element={<OperationalSettings />} />
                 <Route path="settings/users" element={<UsersPage />} />
