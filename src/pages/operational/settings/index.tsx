@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,6 +10,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
 interface Tenant {
@@ -35,28 +44,131 @@ const mockTenants: Tenant[] = [
   },
 ];
 
+// Simula uma API
+const api = {
+  getTenants: async () => mockTenants,
+  createTenant: async (tenant: Omit<Tenant, "id">) => {
+    const newTenant = {
+      ...tenant,
+      id: Math.random().toString(36).substr(2, 9),
+    };
+    mockTenants.push(newTenant);
+    return newTenant;
+  },
+  updateTenant: async (tenant: Tenant) => {
+    const index = mockTenants.findIndex((t) => t.id === tenant.id);
+    if (index !== -1) {
+      mockTenants[index] = tenant;
+    }
+    return tenant;
+  },
+  deleteTenant: async (id: string) => {
+    const index = mockTenants.findIndex((t) => t.id === id);
+    if (index !== -1) {
+      mockTenants.splice(index, 1);
+    }
+    return id;
+  },
+};
+
 export default function OperationalSettings() {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedTenant, setSelectedTenant] = useState<Tenant | null>(null);
+  const [formData, setFormData] = useState<Partial<Tenant>>({
+    name: "",
+    fantasia: "",
+    document: "",
+    email: "",
+    phone: "",
+    status: true,
+  });
+
+  const queryClient = useQueryClient();
 
   const { data: tenants, isLoading } = useQuery({
     queryKey: ["tenants"],
-    queryFn: async () => {
-      // Simular chamada à API
-      return mockTenants;
+    queryFn: api.getTenants,
+  });
+
+  const createMutation = useMutation({
+    mutationFn: api.createTenant,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tenants"] });
+      toast.success("Tenant criado com sucesso!");
+      handleCloseDialog();
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: api.updateTenant,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tenants"] });
+      toast.success("Tenant atualizado com sucesso!");
+      handleCloseDialog();
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: api.deleteTenant,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tenants"] });
+      toast.success("Tenant excluído com sucesso!");
     },
   });
 
   const handleCreate = () => {
-    toast.success("Funcionalidade de criação será implementada");
+    setSelectedTenant(null);
+    setFormData({
+      name: "",
+      fantasia: "",
+      document: "",
+      email: "",
+      phone: "",
+      status: true,
+    });
+    setIsDialogOpen(true);
   };
 
   const handleEdit = (tenant: Tenant) => {
     setSelectedTenant(tenant);
-    toast.success("Funcionalidade de edição será implementada");
+    setFormData(tenant);
+    setIsDialogOpen(true);
   };
 
-  const handleDelete = (tenant: Tenant) => {
-    toast.success("Funcionalidade de exclusão será implementada");
+  const handleDelete = async (tenant: Tenant) => {
+    if (window.confirm("Tem certeza que deseja excluir este tenant?")) {
+      await deleteMutation.mutateAsync(tenant.id);
+    }
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+    setSelectedTenant(null);
+    setFormData({
+      name: "",
+      fantasia: "",
+      document: "",
+      email: "",
+      phone: "",
+      status: true,
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (selectedTenant) {
+      await updateMutation.mutateAsync({ ...formData, id: selectedTenant.id } as Tenant);
+    } else {
+      await createMutation.mutateAsync(formData as Omit<Tenant, "id">);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
   if (isLoading) {
@@ -128,6 +240,77 @@ export default function OperationalSettings() {
           </TableBody>
         </Table>
       </div>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {selectedTenant ? "Editar Tenant" : "Novo Tenant"}
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Nome</Label>
+              <Input
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="fantasia">Nome Fantasia</Label>
+              <Input
+                id="fantasia"
+                name="fantasia"
+                value={formData.fantasia}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="document">CNPJ/CPF</Label>
+              <Input
+                id="document"
+                name="document"
+                value={formData.document}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="phone">Telefone</Label>
+              <Input
+                id="phone"
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={handleCloseDialog}>
+                Cancelar
+              </Button>
+              <Button type="submit">
+                {selectedTenant ? "Salvar" : "Criar"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
