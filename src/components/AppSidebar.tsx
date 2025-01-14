@@ -16,13 +16,13 @@ export function AppSidebar() {
   return (
     <aside
       className={cn(
-        "h-screen sticky top-0 flex flex-col bg-gray-100 border-r border-gray-200 transition-all duration-300",
+        "h-screen sticky top-0 flex flex-col bg-gray-100 border-r border-gray-200 transition-all duration-300 dark:bg-gray-900 dark:border-gray-800",
         collapsed ? "w-20" : "w-64"
       )}
     >
       <SidebarHeader collapsed={collapsed} setCollapsed={setCollapsed} />
 
-      <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+      <nav className="flex-1 p-4 space-y-2 overflow-y-auto scrollbar-custom">
         {menuItems.map((item) => (
           <SidebarMenuItem
             key={item.href}

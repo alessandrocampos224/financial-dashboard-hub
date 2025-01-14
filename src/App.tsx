@@ -28,6 +28,7 @@ import PermissionsPage from "./pages/settings/permissions";
 import PermissionForm from "./pages/settings/permissions/form";
 import RolesPage from "./pages/settings/roles";
 import RoleForm from "./pages/settings/roles/form";
+import CarrierForm from "./pages/inventory/carriers/form";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +64,8 @@ const App = () => {
                 <Route path="inventory/products/new" element={<ProductForm />} />
                 <Route path="inventory/products/:id/edit" element={<ProductForm />} />
                 <Route path="inventory/carriers" element={<CarriersPage />} />
+                <Route path="inventory/carriers/new" element={<CarrierForm />} />
+                <Route path="inventory/carriers/:id/edit" element={<CarrierForm />} />
                 <Route path="financial/sales" element={<SalesListPage />} />
                 <Route path="financial/sales/new" element={<SalesForm />} />
                 <Route path="financial/sales/:id" element={<SalesViewPage />} />

@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
 
 export const columns: ColumnDef<Carrier>[] = [
   {
@@ -50,6 +51,23 @@ export const columns: ColumnDef<Carrier>[] = [
     cell: ({ row }) => {
       const carrier = row.original;
       const navigate = useNavigate();
+      const { toast } = useToast();
+
+      const handleDelete = async () => {
+        try {
+          // TODO: Implementar chamada à API para excluir
+          toast({
+            title: "Sucesso",
+            description: "Transportadora excluída com sucesso!",
+          });
+        } catch (error) {
+          toast({
+            variant: "destructive",
+            title: "Erro",
+            description: "Erro ao excluir transportadora",
+          });
+        }
+      };
 
       return (
         <DropdownMenu>
@@ -67,7 +85,7 @@ export const columns: ColumnDef<Carrier>[] = [
               <Pencil className="mr-2 h-4 w-4" />
               Editar
             </DropdownMenuItem>
-            <DropdownMenuItem className="text-red-600">
+            <DropdownMenuItem onClick={handleDelete} className="text-red-600">
               <Trash className="mr-2 h-4 w-4" />
               Excluir
             </DropdownMenuItem>

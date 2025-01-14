@@ -4,12 +4,21 @@ import { Plus } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
+import { useQuery } from "@tanstack/react-query";
 import { Carrier } from "@/types/carrier";
 
-const data: Carrier[] = []; // TODO: Integrar com API
+// TODO: Implementar função de busca na API
+const fetchCarriers = async (): Promise<Carrier[]> => {
+  return [];
+};
 
 export default function CarriersPage() {
   const navigate = useNavigate();
+  
+  const { data: carriers = [], isLoading } = useQuery({
+    queryKey: ["carriers"],
+    queryFn: fetchCarriers,
+  });
 
   return (
     <div className="p-6">
@@ -22,7 +31,7 @@ export default function CarriersPage() {
       </div>
 
       <Card className="p-6">
-        <DataTable columns={columns} data={data} />
+        <DataTable columns={columns} data={carriers} />
       </Card>
     </div>
   );
