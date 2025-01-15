@@ -18,6 +18,7 @@ const queryClient = new QueryClient({
     queries: {
       retry: 1,
       refetchOnWindowFocus: false,
+      staleTime: 5000,
     },
   },
 });
@@ -42,9 +43,9 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 
 const App = () => {
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>
             <TooltipProvider>
               <Routes>
@@ -68,9 +69,9 @@ const App = () => {
               <Sonner />
             </TooltipProvider>
           </AuthProvider>
-        </BrowserRouter>
-      </QueryClientProvider>
-    </ThemeProvider>
+        </ThemeProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 };
 
