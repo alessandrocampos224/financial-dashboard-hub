@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { CustomerFormValues } from "@/pages/financial/customers/schema";
+import { User } from "@supabase/supabase-js";
 
 export const customerService = {
   async checkExistingUser(email: string) {
@@ -32,7 +33,7 @@ export const customerService = {
         throw authError;
       }
 
-      const userExists = data.users.some(user => user.email === email);
+      const userExists = data.users.some((user: User) => user.email === email);
       console.log('Usuário existe no auth?', userExists);
       
       return !!userExists;
