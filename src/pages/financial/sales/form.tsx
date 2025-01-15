@@ -1,13 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Search, X, Minus, Trash2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { Item } from "@/types/item";
-import { Product } from "@/types/product";
 import { CustomerSelector } from "./components/CustomerSelector";
 import { ProductSearch } from "./components/ProductSearch";
 import { OrderSummary } from "./components/OrderSummary";
 import { supabase } from "@/integrations/supabase/client";
+import { useSaleProducts } from "@/hooks/useSaleProducts";
 
 export default function SalesForm() {
   const navigate = useNavigate();
@@ -15,33 +13,17 @@ export default function SalesForm() {
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isCustomerDialogOpen, setIsCustomerDialogOpen] = useState(false);
-  const [items, setItems] = useState<Item[]>([]);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  
+  const {
+    items,
+    filteredProducts,
+    total,
+    searchProducts,
+    addItem,
+    updateQuantity,
+    removeItem,
+  } = useSaleProducts();
 
-  // Função para buscar produtos baseado no termo de busca
-  const searchProducts = async (term: string) => {
-    if (!term) {
-      setFilteredProducts([]);
-      return;
-    }
-
-    const { data, error } = await supabase
-      .from("products")
-      .select("*")
-      .or(`name.ilike.%${term}%,code.ilike.%${term}%`)
-      .eq('status', true)
-      .limit(5);
-
-    if (error) {
-      console.error("Erro ao buscar produtos:", error);
-      return;
-    }
-
-    setFilteredProducts(data || []);
-  };
-
-  // Atualiza a busca quando o termo muda
   const handleSearchChange = (term: string) => {
     setSearchTerm(term);
     searchProducts(term);
@@ -66,8 +48,6 @@ export default function SalesForm() {
         });
         return;
       }
-
-      const total = items.reduce((sum, item) => sum + (item.amount || 0), 0);
 
       const { data: order, error: orderError } = await supabase
         .from("orders")
@@ -112,76 +92,6 @@ export default function SalesForm() {
       });
     }
   };
-
-  const addItem = (product: Product) => {
-    const existingItem = items.find((item) => item.product_id === product.id);
-
-    if (existingItem) {
-      setItems(
-        items.map((item) =>
-          item.product_id === product.id
-            ? {
-                ...item,
-                quantity: (item.quantity || 0) + 1,
-                amount: ((item.quantity || 0) + 1) * (item.unitary || 0),
-              }
-            : item
-        )
-      );
-    } else {
-      const newItem: Item = {
-        id: Math.random().toString(),
-        tenant_id: "1",
-        order_id: "1",
-        product_id: product.id,
-        quantity: 1,
-        unitary: product.price,
-        amount: product.price,
-        status: true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        product: {
-          name: product.name,
-          code: product.code,
-        },
-      };
-      setItems([...items, newItem]);
-    }
-    setSelectedProduct(null);
-    setSearchTerm("");
-    toast({
-      title: "Produto adicionado",
-      description: `${product.name} foi adicionado ao pedido`,
-    });
-  };
-
-  const updateQuantity = (itemId: string, increment: boolean) => {
-    setItems(
-      items.map((item) => {
-        if (item.id === itemId) {
-          const newQuantity = increment
-            ? (item.quantity || 0) + 1
-            : Math.max((item.quantity || 0) - 1, 1);
-          return {
-            ...item,
-            quantity: newQuantity,
-            amount: newQuantity * (item.unitary || 0),
-          };
-        }
-        return item;
-      })
-    );
-  };
-
-  const removeItem = (itemId: string) => {
-    setItems(items.filter((item) => item.id !== itemId));
-    toast({
-      title: "Produto removido",
-      description: "Item removido do pedido",
-    });
-  };
-
-  const total = items.reduce((sum, item) => sum + (item.amount || 0), 0);
 
   return (
     <div className="container mx-auto py-10">

@@ -10,12 +10,12 @@ interface ProductSearchProps {
   onProductSelect: (product: Product) => void;
 }
 
-export const ProductSearch = ({
+export function ProductSearch({
   searchTerm,
   setSearchTerm,
   filteredProducts,
   onProductSelect,
-}: ProductSearchProps) => {
+}: ProductSearchProps) {
   return (
     <Card className="p-4">
       <div className="space-y-4">
@@ -54,4 +54,4 @@ export const ProductSearch = ({
       </div>
     </Card>
   );
-};
+}
