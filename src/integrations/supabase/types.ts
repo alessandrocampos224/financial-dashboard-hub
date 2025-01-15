@@ -252,58 +252,58 @@ export type Database = {
       }
       payments: {
         Row: {
+          affix: number | null
+          amount: number | null
+          created_at: string | null
+          deleted_at: string | null
+          description: string | null
+          discount: number | null
           id: string
-          tenant_id: string | null
-          safe_id: string | null
-          user_id: string | null
+          number: string | null
           order_id: string | null
           parcela: number | null
-          amount: number | null
-          discount: number | null
-          affix: number | null
           price: number | null
-          description: string | null
-          number: string | null
+          safe_id: string | null
           status: boolean | null
-          created_at: string | null
+          tenant_id: string | null
           updated_at: string | null
-          deleted_at: string | null
+          user_id: string | null
         }
         Insert: {
+          affix?: number | null
+          amount?: number | null
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          discount?: number | null
           id?: string
-          tenant_id?: string | null
-          safe_id?: string | null
-          user_id?: string | null
+          number?: string | null
           order_id?: string | null
           parcela?: number | null
-          amount?: number | null
-          discount?: number | null
-          affix?: number | null
           price?: number | null
-          description?: string | null
-          number?: string | null
+          safe_id?: string | null
           status?: boolean | null
-          created_at?: string | null
+          tenant_id?: string | null
           updated_at?: string | null
-          deleted_at?: string | null
+          user_id?: string | null
         }
         Update: {
+          affix?: number | null
+          amount?: number | null
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          discount?: number | null
           id?: string
-          tenant_id?: string | null
-          safe_id?: string | null
-          user_id?: string | null
+          number?: string | null
           order_id?: string | null
           parcela?: number | null
-          amount?: number | null
-          discount?: number | null
-          affix?: number | null
           price?: number | null
-          description?: string | null
-          number?: string | null
+          safe_id?: string | null
           status?: boolean | null
-          created_at?: string | null
+          tenant_id?: string | null
           updated_at?: string | null
-          deleted_at?: string | null
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -319,45 +319,275 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "safes"
             referencedColumns: ["id"]
-          }
+          },
         ]
+      }
+      permissions: {
+        Row: {
+          alias: string
+          created_at: string | null
+          deleted_at: string | null
+          description: string | null
+          id: string
+          name: string
+          role_id: string | null
+          status: boolean | null
+          tenant_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          alias: string
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          role_id?: string | null
+          status?: boolean | null
+          tenant_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          alias?: string
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          role_id?: string | null
+          status?: boolean | null
+          tenant_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          amount: number | null
+          brand_id: string | null
+          category_id: string | null
+          code: string
+          cover: string | null
+          created_at: string | null
+          deleted_at: string | null
+          description: string | null
+          id: string
+          interest: number | null
+          name: string
+          price: number
+          status: boolean | null
+          stock: number | null
+          subtitle: string | null
+          tenant_id: string | null
+          type: number | null
+          updated_at: string | null
+          weight: number | null
+        }
+        Insert: {
+          amount?: number | null
+          brand_id?: string | null
+          category_id?: string | null
+          code: string
+          cover?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          id?: string
+          interest?: number | null
+          name: string
+          price?: number
+          status?: boolean | null
+          stock?: number | null
+          subtitle?: string | null
+          tenant_id?: string | null
+          type?: number | null
+          updated_at?: string | null
+          weight?: number | null
+        }
+        Update: {
+          amount?: number | null
+          brand_id?: string | null
+          category_id?: string | null
+          code?: string
+          cover?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          id?: string
+          interest?: number | null
+          name?: string
+          price?: number
+          status?: boolean | null
+          stock?: number | null
+          subtitle?: string | null
+          tenant_id?: string | null
+          type?: number | null
+          updated_at?: string | null
+          weight?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          deleted_at: string | null
+          description: string | null
+          document: string | null
+          email: string | null
+          fantasia: string | null
+          id: string
+          ie: string | null
+          name: string | null
+          password: string | null
+          phone: string | null
+          rg: string | null
+          roles_id: string | null
+          status: boolean | null
+          tenant_id: string | null
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          description?: string | null
+          document?: string | null
+          email?: string | null
+          fantasia?: string | null
+          id: string
+          ie?: string | null
+          name?: string | null
+          password?: string | null
+          phone?: string | null
+          rg?: string | null
+          roles_id?: string | null
+          status?: boolean | null
+          tenant_id?: string | null
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          description?: string | null
+          document?: string | null
+          email?: string | null
+          fantasia?: string | null
+          id?: string
+          ie?: string | null
+          name?: string | null
+          password?: string | null
+          phone?: string | null
+          rg?: string | null
+          roles_id?: string | null
+          status?: boolean | null
+          tenant_id?: string | null
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_roles_id_fkey"
+            columns: ["roles_id"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      roles: {
+        Row: {
+          alias: string
+          created_at: string | null
+          deleted_at: string | null
+          description: string | null
+          id: string
+          is_admin: boolean | null
+          name: string
+          status: boolean | null
+          tenant_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          alias: string
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          id?: string
+          is_admin?: boolean | null
+          name: string
+          status?: boolean | null
+          tenant_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          alias?: string
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          id?: string
+          is_admin?: boolean | null
+          name?: string
+          status?: boolean | null
+          tenant_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       safes: {
         Row: {
-          id: string
-          tenant_id: string | null
-          positive: number | null
-          negative: number | null
           amount: number | null
-          description: string | null
-          status: boolean | null
           created_at: string | null
-          updated_at: string | null
           deleted_at: string | null
+          description: string | null
+          id: string
+          negative: number | null
+          positive: number | null
+          status: boolean | null
+          tenant_id: string | null
+          updated_at: string | null
         }
         Insert: {
-          id?: string
-          tenant_id?: string | null
-          positive?: number | null
-          negative?: number | null
           amount?: number | null
-          description?: string | null
-          status?: boolean | null
           created_at?: string | null
-          updated_at?: string | null
           deleted_at?: string | null
+          description?: string | null
+          id?: string
+          negative?: number | null
+          positive?: number | null
+          status?: boolean | null
+          tenant_id?: string | null
+          updated_at?: string | null
         }
         Update: {
-          id?: string
-          tenant_id?: string | null
-          positive?: number | null
-          negative?: number | null
           amount?: number | null
-          description?: string | null
-          status?: boolean | null
           created_at?: string | null
-          updated_at?: string | null
           deleted_at?: string | null
+          description?: string | null
+          id?: string
+          negative?: number | null
+          positive?: number | null
+          status?: boolean | null
+          tenant_id?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -386,7 +616,7 @@ export type Tables<
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
         Database[PublicTableNameOrOptions["schema"]]["Views"])
-    : never,
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
       Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
