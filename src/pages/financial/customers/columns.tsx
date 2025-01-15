@@ -56,7 +56,7 @@ export const columns: ColumnDef<Customer>[] = [
 
       const deleteMutation = useMutation({
         mutationFn: async () => {
-          // Deletar o perfil diretamente
+          console.log("Tentando excluir cliente:", customer.id);
           const { error } = await supabase
             .from("profiles")
             .delete()
