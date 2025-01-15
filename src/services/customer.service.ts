@@ -24,18 +24,18 @@ export const customerService = {
         return true;
       }
 
-      // Verificar se existe na auth
-      const { data: { users }, error: authError } = await supabase.auth.admin.listUsers();
+      // Verificar diretamente com o auth
+      const { data: authUser, error: authError } = await supabase.auth.admin.getUserByEmail(email);
       
       if (authError) {
-        console.error('Erro ao verificar usuários no auth:', authError);
+        if (authError.message.includes('User not found')) {
+          return false;
+        }
+        console.error('Erro ao verificar usuário no auth:', authError);
         throw authError;
       }
 
-      const userExists = users?.some(user => user.email === email);
-      console.log('Usuário existe no auth?', userExists);
-      
-      return userExists;
+      return !!authUser;
     } catch (error) {
       console.error('Erro ao verificar usuário:', error);
       throw error;
