@@ -40,19 +40,37 @@ export default function Login() {
                   },
                 },
               },
+              style: {
+                button: {
+                  borderRadius: '6px',
+                  height: '40px',
+                },
+                input: {
+                  borderRadius: '6px',
+                  height: '40px',
+                },
+              },
             }}
             providers={[]}
+            redirectTo={window.location.origin}
+            onError={(error) => {
+              setError(error.message);
+            }}
             localization={{
               variables: {
                 sign_in: {
                   email_label: "Email",
                   password_label: "Senha",
                   button_label: "Entrar",
+                  email_input_placeholder: "Seu email",
+                  password_input_placeholder: "Sua senha",
                 },
                 sign_up: {
                   email_label: "Email",
                   password_label: "Senha",
                   button_label: "Cadastrar",
+                  email_input_placeholder: "Seu email",
+                  password_input_placeholder: "Sua senha",
                 },
               },
             }}
