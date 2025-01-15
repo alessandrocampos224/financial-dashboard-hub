@@ -6,21 +6,28 @@ export const customerService = {
     try {
       console.log('Verificando existência do usuário:', email);
       
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('id, email')
-        .eq('email', email)
-        .maybeSingle();
-
-      if (profileError) {
-        console.error('Erro ao verificar perfil existente:', profileError);
-        throw profileError;
+      // Verificar diretamente com o auth.getUser
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError) {
+        console.error('Erro ao verificar usuário no auth:', authError);
       }
       
-      return !!profileData;
+      // Verificar na tabela de profiles
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', email)
+        .single();
+
+      if (profileError && profileError.code !== 'PGRST116') {
+        console.error('Erro ao verificar perfil existente:', profileError);
+      }
+      
+      return !!profileData || (user?.email === email);
     } catch (error) {
       console.error('Erro ao verificar usuário:', error);
-      return false;
+      throw error;
     }
   },
 
