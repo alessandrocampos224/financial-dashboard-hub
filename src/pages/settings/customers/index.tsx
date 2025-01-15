@@ -7,11 +7,12 @@ import { Customer } from "@/types/customer";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
 
 export default function CustomersPage() {
   const navigate = useNavigate();
 
-  const { data: customers = [], isLoading } = useQuery({
+  const { data: customers = [], isLoading, error } = useQuery({
     queryKey: ["customers"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -20,11 +21,32 @@ export default function CustomersPage() {
 
       if (error) {
         console.error("Erro ao carregar clientes:", error);
+        toast.error("Erro ao carregar clientes");
         throw error;
       }
+
+      if (!data) {
+        return [];
+      }
+
       return data as Customer[];
     },
   });
+
+  if (error) {
+    return (
+      <div className="container mx-auto py-10">
+        <div className="text-center">
+          <h2 className="text-lg font-semibold text-red-600">
+            Erro ao carregar clientes
+          </h2>
+          <p className="text-gray-600">
+            Por favor, tente novamente mais tarde.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
