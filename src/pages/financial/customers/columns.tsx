@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Customer } from "@/types/customer";
+import { supabase } from "@/integrations/supabase/client";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const columns: ColumnDef<Customer>[] = [
   {
@@ -49,10 +51,32 @@ export const columns: ColumnDef<Customer>[] = [
     id: "actions",
     cell: ({ row }) => {
       const navigate = useNavigate();
+      const queryClient = useQueryClient();
       const customer = row.original;
 
+      const deleteMutation = useMutation({
+        mutationFn: async () => {
+          const { error } = await supabase
+            .from("profiles")
+            .delete()
+            .eq("id", customer.id);
+
+          if (error) throw error;
+        },
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ["customers"] });
+          toast.success("Cliente excluído com sucesso!");
+        },
+        onError: (error) => {
+          console.error("Erro ao excluir cliente:", error);
+          toast.error("Erro ao excluir cliente");
+        },
+      });
+
       const handleDelete = () => {
-        toast.success("Cliente excluído com sucesso!");
+        if (window.confirm("Tem certeza que deseja excluir este cliente?")) {
+          deleteMutation.mutate();
+        }
       };
 
       return (

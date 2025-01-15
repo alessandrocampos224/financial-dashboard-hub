@@ -10,17 +10,37 @@ import { CustomerBasicInfo } from "./components/CustomerBasicInfo";
 import { CustomerDocuments } from "./components/CustomerDocuments";
 import { CustomerContact } from "./components/CustomerContact";
 import { customerFormSchema, type CustomerFormValues } from "./schema";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function CustomerForm() {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditing = !!id;
+  const queryClient = useQueryClient();
+
+  // Buscar dados do cliente se estiver editando
+  const { data: customer, isLoading } = useQuery({
+    queryKey: ["customer", id],
+    queryFn: async () => {
+      if (!id) return null;
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", id)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!id,
+  });
 
   const form = useForm<CustomerFormValues>({
     resolver: zodResolver(customerFormSchema),
     defaultValues: {
       type: "customer",
-      name: "",
+      name: customer?.name || "",
       fantasia: "",
       document: "",
       rg: "",
@@ -34,19 +54,66 @@ export default function CustomerForm() {
     },
   });
 
-  const onSubmit = async (data: CustomerFormValues) => {
-    try {
-      console.log(data);
-      toast.success(
-        isEditing
-          ? "Cliente atualizado com sucesso!"
-          : "Cliente criado com sucesso!"
-      );
+  // Mutation para criar cliente
+  const createMutation = useMutation({
+    mutationFn: async (data: CustomerFormValues) => {
+      const { error } = await supabase.from("profiles").insert([
+        {
+          name: data.name,
+          email: data.email,
+          tenant_id: "1", // Você pode ajustar isso conforme necessário
+        },
+      ]);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["customers"] });
+      toast.success("Cliente criado com sucesso!");
       navigate("/financial/customers");
-    } catch (error) {
-      toast.error("Erro ao salvar cliente");
+    },
+    onError: (error) => {
+      console.error("Erro ao criar cliente:", error);
+      toast.error("Erro ao criar cliente");
+    },
+  });
+
+  // Mutation para atualizar cliente
+  const updateMutation = useMutation({
+    mutationFn: async (data: CustomerFormValues) => {
+      if (!id) return;
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          name: data.name,
+          email: data.email,
+        })
+        .eq("id", id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["customers"] });
+      toast.success("Cliente atualizado com sucesso!");
+      navigate("/financial/customers");
+    },
+    onError: (error) => {
+      console.error("Erro ao atualizar cliente:", error);
+      toast.error("Erro ao atualizar cliente");
+    },
+  });
+
+  const onSubmit = async (data: CustomerFormValues) => {
+    if (isEditing) {
+      updateMutation.mutate(data);
+    } else {
+      createMutation.mutate(data);
     }
   };
+
+  if (isLoading) {
+    return <div>Carregando...</div>;
+  }
 
   return (
     <div className="container mx-auto py-10">
