@@ -5,6 +5,7 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AuthError } from "@supabase/supabase-js";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -31,6 +32,17 @@ export default function Login() {
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  const getErrorMessage = (error: AuthError) => {
+    switch (error.message) {
+      case 'Invalid login credentials':
+        return 'Email ou senha inválidos';
+      case 'Email not confirmed':
+        return 'Por favor, confirme seu email antes de fazer login';
+      default:
+        return error.message;
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
