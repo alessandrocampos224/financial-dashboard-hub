@@ -40,6 +40,9 @@ export default function CustomerFormPage() {
 
         // 2. Buscar o ID do perfil 'customer'
         const roleId = await customerService.getRoleIdByAlias("customer");
+        if (!roleId) {
+          throw new Error("Perfil 'customer' não encontrado.");
+        }
         
         // 3. Criar o cliente
         const customer = await customerService.createCustomer(
