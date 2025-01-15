@@ -62,6 +62,7 @@ export const columns: ColumnDef<Order>[] = [
     cell: ({ row }) => {
       const navigate = useNavigate();
       const order = row.original;
+      const isToday = new Date(order.created_at).toDateString() === new Date().toDateString();
 
       const handleDelete = () => {
         toast.success("Venda excluída com sucesso!");
@@ -76,9 +77,20 @@ export const columns: ColumnDef<Order>[] = [
           >
             <Eye className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={handleDelete}>
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          {isToday && (
+            <>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate(`/financial/sales/${order.id}/edit`)}
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="icon" onClick={handleDelete}>
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </>
+          )}
         </div>
       );
     },

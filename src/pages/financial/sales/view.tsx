@@ -66,7 +66,7 @@ export default function SalesViewPage() {
             <div>
               <p className="text-sm text-muted-foreground">Valor Total</p>
               <p className="font-medium">
-                {order.price?.toLocaleString("pt-BR", {
+                {orderpt-BR", {
                   style: "currency",
                   currency: "BRL",
                 })}
