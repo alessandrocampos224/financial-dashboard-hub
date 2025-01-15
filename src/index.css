@@ -78,7 +78,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-gdrive-background text-gdrive-text dark:bg-gdrive-background dark:text-gdrive-text;
+    @apply bg-background text-foreground dark:bg-gdrive-background dark:text-gdrive-text;
   }
 }
 
