@@ -7,6 +7,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "next-themes";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
+import DashboardPage from "./pages/dashboard";
 import TaxesPage from "./pages/inventory/taxes";
 import CategoriesPage from "./pages/inventory/categories";
 import CategoryForm from "./pages/inventory/categories/form";
@@ -46,47 +47,48 @@ const App = () => {
           <AuthProvider>
             <TooltipProvider>
               <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route
-                path="/"
-                element={
-                  <PrivateRoute>
-                    <Index />
-                  </PrivateRoute>
-                }
-              >
-                <Route path="inventory/taxes" element={<TaxesPage />} />
-                <Route path="inventory/categories" element={<CategoriesPage />} />
-                <Route path="inventory/categories/new" element={<CategoryForm />} />
-                <Route path="inventory/categories/:id/edit" element={<CategoryForm />} />
-                <Route path="inventory/brands" element={<BrandsPage />} />
-                <Route path="inventory/brands/new" element={<BrandForm />} />
-                <Route path="inventory/brands/:id/edit" element={<BrandForm />} />
-                <Route path="inventory/products" element={<ProductsPage />} />
-                <Route path="inventory/products/new" element={<ProductForm />} />
-                <Route path="inventory/products/:id/edit" element={<ProductForm />} />
-                <Route path="inventory/carriers" element={<CarriersPage />} />
-                <Route path="inventory/carriers/new" element={<CarrierForm />} />
-                <Route path="inventory/carriers/:id/edit" element={<CarrierForm />} />
-                <Route path="financial/sales" element={<SalesListPage />} />
-                <Route path="financial/sales/new" element={<SalesForm />} />
-                <Route path="financial/sales/:id" element={<SalesViewPage />} />
-                <Route path="financial/sales/:id/edit" element={<SalesForm />} />
-                <Route path="financial/cashier" element={<CashierPage />} />
-                <Route path="financial/payments" element={<PaymentsPage />} />
-                <Route path="financial/payments/new" element={<PaymentForm />} />
-                <Route path="financial/payments/:id/edit" element={<PaymentForm />} />
-                <Route path="operational/settings" element={<OperationalSettings />} />
-                <Route path="settings/users" element={<UsersPage />} />
-                <Route path="settings/users/new" element={<UserForm />} />
-                <Route path="settings/users/:id/edit" element={<UserForm />} />
-                <Route path="settings/permissions" element={<PermissionsPage />} />
-                <Route path="settings/permissions/new" element={<PermissionForm />} />
-                <Route path="settings/permissions/:id/edit" element={<PermissionForm />} />
-                <Route path="settings/roles" element={<RolesPage />} />
-                <Route path="settings/roles/new" element={<RoleForm />} />
-                <Route path="settings/roles/:id/edit" element={<RoleForm />} />
-              </Route>
+                <Route path="/login" element={<Login />} />
+                <Route
+                  path="/"
+                  element={
+                    <PrivateRoute>
+                      <Index />
+                    </PrivateRoute>
+                  }
+                >
+                  <Route index element={<DashboardPage />} />
+                  <Route path="inventory/taxes" element={<TaxesPage />} />
+                  <Route path="inventory/categories" element={<CategoriesPage />} />
+                  <Route path="inventory/categories/new" element={<CategoryForm />} />
+                  <Route path="inventory/categories/:id/edit" element={<CategoryForm />} />
+                  <Route path="inventory/brands" element={<BrandsPage />} />
+                  <Route path="inventory/brands/new" element={<BrandForm />} />
+                  <Route path="inventory/brands/:id/edit" element={<BrandForm />} />
+                  <Route path="inventory/products" element={<ProductsPage />} />
+                  <Route path="inventory/products/new" element={<ProductForm />} />
+                  <Route path="inventory/products/:id/edit" element={<ProductForm />} />
+                  <Route path="inventory/carriers" element={<CarriersPage />} />
+                  <Route path="inventory/carriers/new" element={<CarrierForm />} />
+                  <Route path="inventory/carriers/:id/edit" element={<CarrierForm />} />
+                  <Route path="financial/sales" element={<SalesListPage />} />
+                  <Route path="financial/sales/new" element={<SalesForm />} />
+                  <Route path="financial/sales/:id" element={<SalesViewPage />} />
+                  <Route path="financial/sales/:id/edit" element={<SalesForm />} />
+                  <Route path="financial/cashier" element={<CashierPage />} />
+                  <Route path="financial/payments" element={<PaymentsPage />} />
+                  <Route path="financial/payments/new" element={<PaymentForm />} />
+                  <Route path="financial/payments/:id/edit" element={<PaymentForm />} />
+                  <Route path="operational/settings" element={<OperationalSettings />} />
+                  <Route path="settings/users" element={<UsersPage />} />
+                  <Route path="settings/users/new" element={<UserForm />} />
+                  <Route path="settings/users/:id/edit" element={<UserForm />} />
+                  <Route path="settings/permissions" element={<PermissionsPage />} />
+                  <Route path="settings/permissions/new" element={<PermissionForm />} />
+                  <Route path="settings/permissions/:id/edit" element={<PermissionForm />} />
+                  <Route path="settings/roles" element={<RolesPage />} />
+                  <Route path="settings/roles/new" element={<RoleForm />} />
+                  <Route path="settings/roles/:id/edit" element={<RoleForm />} />
+                </Route>
               </Routes>
               <Toaster />
               <Sonner />
