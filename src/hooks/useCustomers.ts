@@ -29,6 +29,19 @@ export function useCustomers() {
     mutationFn: async (customerId: string) => {
       console.log("Iniciando exclusão do cliente:", customerId);
       
+      // Primeiro, verificamos se o cliente existe
+      const { data: customer, error: fetchError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', customerId)
+        .single();
+
+      if (fetchError) {
+        console.error("Erro ao buscar cliente:", fetchError);
+        throw new Error("Cliente não encontrado");
+      }
+
+      // Se o cliente existe, procedemos com a exclusão
       const { error } = await supabase.functions.invoke('delete-profile', {
         body: { profileId: customerId }
       });
@@ -37,10 +50,12 @@ export function useCustomers() {
         console.error("Erro ao excluir cliente:", error);
         throw error;
       }
+
+      return customer;
     },
-    onSuccess: () => {
+    onSuccess: (deletedCustomer) => {
       queryClient.invalidateQueries({ queryKey: ["customers"] });
-      toast.success("Cliente excluído com sucesso!");
+      toast.success(`Cliente ${deletedCustomer.name} excluído com sucesso!`);
     },
     onError: (error: Error) => {
       console.error("Erro ao excluir cliente:", error);

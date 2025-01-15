@@ -27,9 +27,9 @@ serve(async (req) => {
       )
     }
 
-    console.log('Iniciando exclusão do perfil:', profileId)
+    console.log('Iniciando processo de exclusão do perfil:', profileId)
 
-    // Buscar o perfil antes de deletar para garantir que existe
+    // 1. Primeiro, verificar se o perfil existe
     const { data: profile, error: fetchError } = await supabase
       .from('profiles')
       .select('*')
@@ -37,28 +37,24 @@ serve(async (req) => {
       .single()
 
     if (fetchError || !profile) {
-      console.error('Erro ao buscar perfil:', fetchError)
+      console.error('Erro ao buscar perfil ou perfil não encontrado:', fetchError)
       return new Response(
         JSON.stringify({ error: 'Profile not found' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 404 }
       )
     }
 
-    // Deletar o perfil
-    const { error: deleteError } = await supabase
-      .from('profiles')
-      .delete()
-      .eq('id', profileId)
+    // 2. Deletar o usuário da autenticação
+    const { error: authError } = await supabase.auth.admin.deleteUser(profileId)
 
-    if (deleteError) {
-      console.error('Erro ao deletar perfil:', deleteError)
-      return new Response(
-        JSON.stringify({ error: 'Failed to delete profile' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
-      )
+    if (authError) {
+      console.error('Erro ao deletar usuário da autenticação:', authError)
+      throw authError
     }
 
-    console.log('Perfil deletado com sucesso:', profileId)
+    console.log('Usuário deletado com sucesso da autenticação')
+
+    // 3. O perfil será deletado automaticamente devido à constraint ON DELETE CASCADE
 
     return new Response(
       JSON.stringify({ message: 'Profile deleted successfully' }),
