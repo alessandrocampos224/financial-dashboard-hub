@@ -37,21 +37,26 @@ export default function CustomerForm() {
   const form = useForm<CustomerFormValues>({
     resolver: zodResolver(customerFormSchema),
     defaultValues: {
+      type: "customer",
       name: customer?.name || "",
+      fantasia: customer?.fantasia || "",
+      document: customer?.document || "",
+      rg: customer?.rg || "",
+      ie: customer?.ie || "ISENTO",
+      phone: customer?.phone || "",
       email: customer?.email || "",
-      description: "",
-      status: true,
+      password: "",
+      roles_id: customer?.roles_id || "",
+      description: customer?.description || "",
+      status: customer?.status ?? true,
     },
   });
 
   const createMutation = useMutation({
     mutationFn: async (data: CustomerFormValues) => {
-      const newId = crypto.randomUUID();
       const { error } = await supabase.from("profiles").insert({
-        id: newId,
-        name: data.name,
-        email: data.email,
-        tenant_id: "1",
+        ...data,
+        tenant_id: "1", // Você pode ajustar isso conforme necessário
       });
 
       if (error) throw error;
@@ -73,8 +78,7 @@ export default function CustomerForm() {
       const { error } = await supabase
         .from("profiles")
         .update({
-          name: data.name,
-          email: data.email,
+          ...data,
         })
         .eq("id", id);
 

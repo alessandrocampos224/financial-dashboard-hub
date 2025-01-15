@@ -23,6 +23,62 @@ export function CustomerBasicInfo({ form }: CustomerBasicInfoProps) {
           </FormItem>
         )}
       />
+
+      <FormField
+        control={form.control}
+        name="fantasia"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Nome Fantasia</FormLabel>
+            <FormControl>
+              <Input {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="document"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>CPF/CNPJ</FormLabel>
+            <FormControl>
+              <Input {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="rg"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>RG</FormLabel>
+            <FormControl>
+              <Input {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="ie"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Inscrição Estadual</FormLabel>
+            <FormControl>
+              <Input {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </>
   );
 }

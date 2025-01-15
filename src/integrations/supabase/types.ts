@@ -385,7 +385,8 @@ export type Database = {
           password: string | null
           phone: string | null
           rg: string | null
-          roles_id: string | null
+          roles_id: string
+          status: boolean | null
           tenant_id: string | null
           type: string
           updated_at: string
@@ -404,7 +405,8 @@ export type Database = {
           password?: string | null
           phone?: string | null
           rg?: string | null
-          roles_id?: string | null
+          roles_id: string
+          status?: boolean | null
           tenant_id?: string | null
           type?: string
           updated_at?: string
@@ -423,7 +425,8 @@ export type Database = {
           password?: string | null
           phone?: string | null
           rg?: string | null
-          roles_id?: string | null
+          roles_id?: string
+          status?: boolean | null
           tenant_id?: string | null
           type?: string
           updated_at?: string
