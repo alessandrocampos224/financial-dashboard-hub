@@ -19,13 +19,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { CustomerSelector } from "@/pages/financial/sales/components/CustomerSelector";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 
 interface FormData {
-  type: "entrada" | "saida";
   amount: number;
   description: string;
   paymentMethod: string;
@@ -36,14 +34,10 @@ export default function PaymentForm() {
   const [searchParams] = useSearchParams();
   const orderId = searchParams.get('order_id');
   const { user } = useAuth();
-  const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
-  const [isCustomerDialogOpen, setIsCustomerDialogOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
   const [orderDetails, setOrderDetails] = useState<any>(null);
 
   const form = useForm<FormData>({
     defaultValues: {
-      type: "entrada",
       amount: 0,
       description: "",
       paymentMethod: "",
@@ -71,7 +65,6 @@ export default function PaymentForm() {
 
       if (order) {
         setOrderDetails(order);
-        setSelectedCustomer(order.customer);
         form.setValue('amount', order.amount);
         form.setValue('description', `Pagamento da venda #${order.id}`);
       }
@@ -83,11 +76,6 @@ export default function PaymentForm() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      if (!selectedCustomer) {
-        toast.error('Selecione um cliente');
-        return;
-      }
-
       if (!user) {
         toast.error('Você precisa estar logado para registrar um pagamento');
         return;
@@ -148,7 +136,7 @@ export default function PaymentForm() {
       }
 
       toast.success('Pagamento registrado com sucesso!');
-      navigate('/financial/payments');
+      navigate('/financial/sales');
     } catch (error) {
       console.error('Erro ao registrar pagamento:', error);
       toast.error('Erro ao registrar pagamento');
@@ -161,109 +149,98 @@ export default function PaymentForm() {
         <h1 className="text-3xl font-bold mb-4">Novo Pagamento</h1>
       </div>
 
-      <div className="grid gap-6 mb-6">
-        <div>
-          <h2 className="text-lg font-semibold mb-2">Selecionar Cliente</h2>
-          <CustomerSelector
-            selectedCustomer={selectedCustomer}
-            setSelectedCustomer={setSelectedCustomer}
-            isCustomerDialogOpen={isCustomerDialogOpen}
-            setIsCustomerDialogOpen={setIsCustomerDialogOpen}
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-          />
+      {orderDetails && (
+        <div className="bg-muted p-4 rounded-lg mb-6">
+          <h3 className="font-semibold mb-2">Detalhes da Venda</h3>
+          <p className="text-lg mb-2">
+            Cliente: {orderDetails.customer?.name}
+          </p>
+          <p className="text-lg mb-2">
+            Total: {orderDetails.amount.toLocaleString("pt-BR", {
+              style: "currency",
+              currency: "BRL",
+            })}
+          </p>
         </div>
+      )}
 
-        {orderDetails && (
-          <div className="bg-muted p-4 rounded-lg">
-            <h3 className="font-semibold mb-2">Detalhes da Venda</h3>
-            <p className="text-lg mb-2">
-              Total: {orderDetails.amount.toLocaleString("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-              })}
-            </p>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <FormField
+            control={form.control}
+            name="amount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Valor</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    placeholder="0,00"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="paymentMethod"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Forma de Pagamento</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione a forma de pagamento" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="dinheiro">Dinheiro</SelectItem>
+                    <SelectItem value="pix">PIX</SelectItem>
+                    <SelectItem value="cartao">Cartão</SelectItem>
+                    <SelectItem value="boleto">Boleto</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Descrição</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Digite uma descrição para o pagamento"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="flex gap-4">
+            <Button type="submit">Salvar</Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => navigate("/financial/sales")}
+            >
+              Cancelar
+            </Button>
           </div>
-        )}
-
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="amount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Valor</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      placeholder="0,00"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="paymentMethod"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Forma de Pagamento</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione a forma de pagamento" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="dinheiro">Dinheiro</SelectItem>
-                      <SelectItem value="pix">PIX</SelectItem>
-                      <SelectItem value="cartao">Cartão</SelectItem>
-                      <SelectItem value="boleto">Boleto</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Descrição</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Digite uma descrição para o pagamento"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="flex gap-4">
-              <Button type="submit">Salvar</Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => navigate("/financial/payments")}
-              >
-                Cancelar
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </div>
+        </form>
+      </Form>
     </div>
   );
 }
