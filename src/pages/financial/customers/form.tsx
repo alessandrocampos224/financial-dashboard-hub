@@ -7,7 +7,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CustomerBasicInfo } from "./components/CustomerBasicInfo";
-import { CustomerDocuments } from "./components/CustomerDocuments";
 import { CustomerContact } from "./components/CustomerContact";
 import { customerFormSchema, type CustomerFormValues } from "./schema";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -45,13 +44,14 @@ export default function CustomerForm() {
     },
   });
 
-  // Mutation para criar cliente
   const createMutation = useMutation({
     mutationFn: async (data: CustomerFormValues) => {
+      const newId = crypto.randomUUID();
       const { error } = await supabase.from("profiles").insert({
+        id: newId,
         name: data.name,
         email: data.email,
-        tenant_id: "1", // Você pode ajustar isso conforme necessário
+        tenant_id: "1",
       });
 
       if (error) throw error;
@@ -67,7 +67,6 @@ export default function CustomerForm() {
     },
   });
 
-  // Mutation para atualizar cliente
   const updateMutation = useMutation({
     mutationFn: async (data: CustomerFormValues) => {
       if (!id) return;
@@ -116,7 +115,6 @@ export default function CustomerForm() {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <CustomerBasicInfo form={form} />
-            <CustomerDocuments form={form} />
             <CustomerContact form={form} />
 
             <div className="col-span-2">
