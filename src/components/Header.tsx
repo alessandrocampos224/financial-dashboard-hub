@@ -41,8 +41,8 @@ export function Header() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                 <Avatar>
-                  <AvatarImage src={user?.avatar_url} alt={user?.name} />
-                  <AvatarFallback>{user?.name?.charAt(0) || 'U'}</AvatarFallback>
+                  <AvatarImage src={user?.profile?.avatar_url || ''} alt={user?.profile?.name || ''} />
+                  <AvatarFallback>{user?.profile?.name?.charAt(0) || 'U'}</AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
@@ -50,10 +50,10 @@ export function Header() {
               <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
-                {user?.name || "Usuário"}
+                {user?.profile?.name || "Usuário"}
               </DropdownMenuItem>
               <DropdownMenuItem>
-                {user?.email || "email@exemplo.com"}
+                {user?.profile?.email || "email@exemplo.com"}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={logout} className="text-destructive">

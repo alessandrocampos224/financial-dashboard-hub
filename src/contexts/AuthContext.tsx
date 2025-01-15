@@ -2,9 +2,12 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { User } from '@supabase/supabase-js';
+import { Database } from '@/integrations/supabase/types';
+
+type Profile = Database['public']['Tables']['profiles']['Row'];
 
 interface AuthContextType {
-  user: User | null;
+  user: (User & { profile?: Profile }) | null;
   loading: boolean;
   logout: () => Promise<void>;
 }
@@ -12,13 +15,39 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<(User & { profile?: Profile }) | null>(null);
   const [loading, setLoading] = useState(true);
+
+  async function getProfile(userId: string) {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Erro ao buscar perfil:', error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Erro ao buscar perfil:', error);
+      return null;
+    }
+  }
 
   useEffect(() => {
     checkUser();
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      const currentUser = session?.user ?? null;
+      if (currentUser) {
+        const profile = await getProfile(currentUser.id);
+        setUser({ ...currentUser, profile });
+      } else {
+        setUser(null);
+      }
       setLoading(false);
     });
 
@@ -27,8 +56,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   async function checkUser() {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (currentUser) {
+        const profile = await getProfile(currentUser.id);
+        setUser({ ...currentUser, profile });
+      }
     } catch (error) {
       console.error('Erro ao verificar usuário:', error);
     } finally {
