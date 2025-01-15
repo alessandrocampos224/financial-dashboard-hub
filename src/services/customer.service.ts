@@ -25,14 +25,14 @@ export const customerService = {
       }
 
       // Verificar diretamente com o auth
-      const { data: users, error: authError } = await supabase.auth.admin.listUsers();
+      const { data, error: authError } = await supabase.auth.admin.listUsers();
       
       if (authError) {
         console.error('Erro ao verificar usuários no auth:', authError);
         throw authError;
       }
 
-      const userExists = users?.some(user => user.email === email);
+      const userExists = data.users.some(user => user.email === email);
       console.log('Usuário existe no auth?', userExists);
       
       return !!userExists;
