@@ -62,11 +62,16 @@ export default function PaymentForm() {
         .eq('id', orderId)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao buscar detalhes do pedido:', error);
+        toast.error('Erro ao carregar detalhes do pedido');
+        return;
+      }
 
       if (order) {
+        console.log('Detalhes do pedido:', order);
         setOrderDetails(order);
-        form.setValue('amount', order.amount);
+        form.setValue('amount', order.amount || 0);
         form.setValue('description', `Pagamento da venda #${order.id}`);
       }
     } catch (error) {
@@ -79,6 +84,11 @@ export default function PaymentForm() {
     try {
       if (!user) {
         toast.error('Você precisa estar logado para registrar um pagamento');
+        return;
+      }
+
+      if (!orderId) {
+        toast.error('Venda não encontrada');
         return;
       }
 
@@ -149,7 +159,7 @@ export default function PaymentForm() {
   return (
     <div className="container mx-auto py-10">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-4">Novo Pagamento</h1>
+        <h1 className="text-3xl font-bold">Novo Pagamento</h1>
       </div>
 
       {orderDetails && (
@@ -159,7 +169,7 @@ export default function PaymentForm() {
             Cliente: {orderDetails.customer?.name}
           </p>
           <p className="text-lg mb-2">
-            Total: {orderDetails.amount.toLocaleString("pt-BR", {
+            Total: {orderDetails.amount?.toLocaleString("pt-BR", {
               style: "currency",
               currency: "BRL",
             })}
