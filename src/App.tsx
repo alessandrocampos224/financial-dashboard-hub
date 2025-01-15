@@ -20,10 +20,18 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   
   if (loading) {
-    return <div>Carregando...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-lg">Carregando...</div>
+      </div>
+    );
   }
   
-  return user ? children : <Navigate to="/login" />;
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
+
+  return children;
 }
 
 const App = () => {

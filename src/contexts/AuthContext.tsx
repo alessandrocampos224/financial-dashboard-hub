@@ -39,12 +39,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   useEffect(() => {
-    checkUser();
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      const currentUser = session?.user ?? null;
-      if (currentUser) {
-        const profile = await getProfile(currentUser.id);
-        setUser({ ...currentUser, profile });
+    // Verificar sessão atual
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session?.user) {
+        const profile = await getProfile(session.user.id);
+        setUser({ ...session.user, profile });
+      }
+      setLoading(false);
+    });
+
+    // Escutar mudanças na autenticação
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event);
+      if (session?.user) {
+        const profile = await getProfile(session.user.id);
+        setUser({ ...session.user, profile });
       } else {
         setUser(null);
       }
@@ -53,20 +62,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return () => subscription.unsubscribe();
   }, []);
-
-  async function checkUser() {
-    try {
-      const { data: { user: currentUser } } = await supabase.auth.getUser();
-      if (currentUser) {
-        const profile = await getProfile(currentUser.id);
-        setUser({ ...currentUser, profile });
-      }
-    } catch (error) {
-      console.error('Erro ao verificar usuário:', error);
-    } finally {
-      setLoading(false);
-    }
-  }
 
   async function logout() {
     try {
