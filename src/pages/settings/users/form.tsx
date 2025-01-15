@@ -29,6 +29,7 @@ const formSchema = z.object({
   roles_id: z.string().min(1, "Perfil é obrigatório"),
   description: z.string().optional(),
   status: z.boolean().default(true),
+  avatar_url: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -53,6 +54,7 @@ export default function UserForm() {
       roles_id: "",
       description: "",
       status: true,
+      avatar_url: "",
     },
   });
 
@@ -249,6 +251,20 @@ export default function UserForm() {
                   <div className="space-y-1 leading-none">
                     <FormLabel>Ativo</FormLabel>
                   </div>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="avatar_url"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Avatar (URL)</FormLabel>
+                  <FormControl>
+                    <Input {...field} type="url" placeholder="https://exemplo.com/avatar.jpg" />
+                  </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
