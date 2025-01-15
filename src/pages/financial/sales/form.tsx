@@ -6,10 +6,12 @@ import { ProductSearch } from "./components/ProductSearch";
 import { OrderSummary } from "./components/OrderSummary";
 import { supabase } from "@/integrations/supabase/client";
 import { useSaleProducts } from "@/hooks/useSaleProducts";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function SalesForm() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isCustomerDialogOpen, setIsCustomerDialogOpen] = useState(false);
@@ -49,10 +51,20 @@ export default function SalesForm() {
         return;
       }
 
+      if (!user) {
+        toast({
+          variant: "destructive",
+          title: "Erro",
+          description: "Você precisa estar logado para criar uma venda",
+        });
+        return;
+      }
+
       const { data: order, error: orderError } = await supabase
         .from("orders")
         .insert({
           customer_id: selectedCustomer.id,
+          user_id: user.id, // Adicionando o user_id do usuário logado
           amount: total,
           price: total,
           status: true,
