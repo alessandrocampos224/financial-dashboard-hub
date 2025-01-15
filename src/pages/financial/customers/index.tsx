@@ -3,25 +3,28 @@ import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Customer } from "@/types/customer";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useCustomers } from "@/hooks/useCustomers";
 
 export default function CustomersPage() {
   const navigate = useNavigate();
+  const { customers, isLoading } = useCustomers();
 
-  const { data: customers = [], isLoading } = useQuery({
-    queryKey: ["customers"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data as Customer[];
-    },
-  });
+  if (isLoading) {
+    return (
+      <div className="container mx-auto py-10">
+        <div className="flex justify-between items-center mb-8">
+          <Skeleton className="h-8 w-32" />
+          <Skeleton className="h-10 w-32" />
+        </div>
+        <div className="space-y-4">
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-12 w-full" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto py-10">

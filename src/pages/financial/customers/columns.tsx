@@ -3,10 +3,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowUpDown, Pencil, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
 import { Customer } from "@/types/customer";
-import { supabase } from "@/integrations/supabase/client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useCustomers } from "@/hooks/useCustomers";
 
 export const columns: ColumnDef<Customer>[] = [
   {
@@ -47,63 +45,16 @@ export const columns: ColumnDef<Customer>[] = [
       );
     },
   },
-
   {
     id: "actions",
     cell: ({ row }) => {
       const navigate = useNavigate();
-      const queryClient = useQueryClient();
+      const { deleteCustomer } = useCustomers();
       const customer = row.original;
-
-      const deleteMutation = useMutation({
-        mutationFn: async () => {
-          console.log("Iniciando processo de exclusão do cliente:", customer.id);
-          
-          // Primeiro verificar se o perfil existe
-          const { data: existingProfile, error: checkError } = await supabase
-            .from("profiles")
-            .select()
-            .eq("id", customer.id)
-            .single();
-
-          if (checkError) {
-            console.error("Erro ao verificar perfil:", checkError);
-            throw new Error("Erro ao verificar existência do perfil");
-          }
-
-          if (!existingProfile) {
-            throw new Error("Perfil não encontrado");
-          }
-
-          // Tentar deletar o perfil
-          const { data, error } = await supabase
-            .from("profiles")
-            .delete()
-            .eq("id", customer.id)
-            .select()
-            .single();
-
-          if (error) {
-            console.error("Erro detalhado ao deletar perfil:", error);
-            throw new Error(error.message);
-          }
-
-          console.log("Cliente excluído com sucesso:", data);
-          return data;
-        },
-        onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: ["customers"] });
-          toast.success("Cliente excluído com sucesso!");
-        },
-        onError: (error: Error) => {
-          console.error("Erro ao excluir cliente:", error);
-          toast.error(`Erro ao excluir cliente: ${error.message}`);
-        },
-      });
 
       const handleDelete = () => {
         if (window.confirm("Tem certeza que deseja excluir este cliente?")) {
-          deleteMutation.mutate();
+          deleteCustomer(customer.id);
         }
       };
 
