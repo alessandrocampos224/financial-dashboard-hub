@@ -6,25 +6,36 @@ export const customerService = {
     try {
       console.log('Verificando existência do usuário:', email);
       
-      // Verificar diretamente com o auth.getUser
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      
-      if (authError) {
-        console.error('Erro ao verificar usuário no auth:', authError);
-      }
-      
       // Verificar na tabela de profiles
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('id')
         .eq('email', email)
-        .single();
+        .maybeSingle();
 
       if (profileError && profileError.code !== 'PGRST116') {
         console.error('Erro ao verificar perfil existente:', profileError);
+        throw profileError;
       }
+
+      // Se encontrou um perfil, o usuário já existe
+      if (profileData) {
+        console.log('Usuário encontrado no profiles:', profileData);
+        return true;
+      }
+
+      // Verificar se existe na auth
+      const { data: { users }, error: authError } = await supabase.auth.admin.listUsers();
       
-      return !!profileData || (user?.email === email);
+      if (authError) {
+        console.error('Erro ao verificar usuários no auth:', authError);
+        throw authError;
+      }
+
+      const userExists = users?.some(user => user.email === email);
+      console.log('Usuário existe no auth?', userExists);
+      
+      return userExists;
     } catch (error) {
       console.error('Erro ao verificar usuário:', error);
       throw error;
