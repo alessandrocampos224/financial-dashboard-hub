@@ -23,6 +23,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
+import { useQuery } from "@tanstack/react-query";
 
 interface FormData {
   amount: number;
@@ -35,25 +36,13 @@ export default function PaymentForm() {
   const [searchParams] = useSearchParams();
   const orderId = searchParams.get('order_id');
   const { user } = useAuth();
-  const [orderDetails, setOrderDetails] = useState<any>(null);
 
-  const form = useForm<FormData>({
-    defaultValues: {
-      amount: 0,
-      description: "",
-      paymentMethod: "",
-    },
-  });
+  const { data: orderDetails, isLoading } = useQuery({
+    queryKey: ['order', orderId],
+    queryFn: async () => {
+      if (!orderId) return null;
 
-  useEffect(() => {
-    if (orderId) {
-      fetchOrderDetails();
-    }
-  }, [orderId]);
-
-  const fetchOrderDetails = async () => {
-    try {
-      const { data: order, error } = await supabase
+      const { data, error } = await supabase
         .from('orders')
         .select(`
           *,
@@ -65,20 +54,28 @@ export default function PaymentForm() {
       if (error) {
         console.error('Erro ao buscar detalhes do pedido:', error);
         toast.error('Erro ao carregar detalhes do pedido');
-        return;
+        throw error;
       }
 
-      if (order) {
-        console.log('Detalhes do pedido:', order);
-        setOrderDetails(order);
-        form.setValue('amount', order.amount || 0);
-        form.setValue('description', `Pagamento da venda #${order.id}`);
-      }
-    } catch (error) {
-      console.error('Erro ao buscar detalhes do pedido:', error);
-      toast.error('Erro ao carregar detalhes do pedido');
+      return data;
+    },
+    enabled: !!orderId,
+  });
+
+  const form = useForm<FormData>({
+    defaultValues: {
+      amount: 0,
+      description: "",
+      paymentMethod: "",
+    },
+  });
+
+  useEffect(() => {
+    if (orderDetails) {
+      form.setValue('amount', orderDetails.amount || 0);
+      form.setValue('description', `Pagamento da venda #${orderDetails.id}`);
     }
-  };
+  }, [orderDetails, form]);
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -145,16 +142,29 @@ export default function PaymentForm() {
       if (orderError) throw orderError;
 
       toast.success('Pagamento registrado com sucesso!');
-      navigate('/financial/sales');
+      navigate('/financial/payments');
     } catch (error) {
       console.error('Erro ao registrar pagamento:', error);
       toast.error('Erro ao registrar pagamento');
     }
   };
 
-  const handleCancel = () => {
-    navigate('/financial/sales');
-  };
+  if (isLoading) {
+    return <div>Carregando...</div>;
+  }
+
+  if (!orderDetails) {
+    return (
+      <div className="container mx-auto py-10">
+        <div className="flex flex-col items-center justify-center space-y-4">
+          <h1 className="text-2xl font-bold">Venda não encontrada</h1>
+          <Button onClick={() => navigate('/financial/sales')}>
+            Voltar para Vendas
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto py-10">
@@ -162,20 +172,18 @@ export default function PaymentForm() {
         <h1 className="text-3xl font-bold">Novo Pagamento</h1>
       </div>
 
-      {orderDetails && (
-        <Card className="bg-muted p-4 rounded-lg mb-6">
-          <h3 className="font-semibold mb-2">Detalhes da Venda</h3>
-          <p className="text-lg mb-2">
-            Cliente: {orderDetails.customer?.name}
-          </p>
-          <p className="text-lg mb-2">
-            Total: {orderDetails.amount?.toLocaleString("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-            })}
-          </p>
-        </Card>
-      )}
+      <Card className="bg-muted p-4 rounded-lg mb-6">
+        <h3 className="font-semibold mb-2">Detalhes da Venda</h3>
+        <p className="text-lg mb-2">
+          Cliente: {orderDetails.customer?.name}
+        </p>
+        <p className="text-lg mb-2">
+          Total: {orderDetails.amount?.toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+          })}
+        </p>
+      </Card>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -247,7 +255,7 @@ export default function PaymentForm() {
             <Button
               type="button"
               variant="outline"
-              onClick={handleCancel}
+              onClick={() => navigate('/financial/sales')}
             >
               Voltar para Vendas
             </Button>
