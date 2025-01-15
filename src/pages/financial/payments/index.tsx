@@ -4,30 +4,38 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
-
-const mockPayments = [
-  {
-    id: "01HGY5RZ8YKWJ6XZXH8Q9X8C1N",
-    tenant_id: "01HGY5RZ8YKWJ6XZXH8Q9X8C1N",
-    safe_id: "01HGY5RZ8YKWJ6XZXH8Q9X8C1N",
-    user_id: "01HGY5RZ8YKWJ6XZXH8Q9X8C1N",
-    parcela: 1,
-    amount: 150.00,
-    discount: 0,
-    affix: 0,
-    price: 150.00,
-    description: "Pagamento de venda #123",
-    number: "PAY123",
-    status: true,
-    created_at: "2024-01-15T00:00:00.000Z",
-    updated_at: "2024-01-15T00:00:00.000Z",
-    deleted_at: null,
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function PaymentsPage() {
   const navigate = useNavigate();
-  const [payments] = useState(mockPayments);
+  const { user } = useAuth();
+
+  const { data: payments = [] } = useQuery({
+    queryKey: ["payments", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("payments")
+        .select(`
+          *,
+          order:orders(
+            *,
+            customer:profiles(*)
+          )
+        `)
+        .eq("user_id", user?.id)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Erro ao buscar pagamentos:", error);
+        throw error;
+      }
+
+      return data || [];
+    },
+    enabled: !!user?.id,
+  });
 
   return (
     <div className="container mx-auto py-10">

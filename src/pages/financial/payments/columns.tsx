@@ -1,9 +1,8 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, Pencil, Trash2 } from "lucide-react";
+import { ArrowUpDown, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
 import { Payment } from "@/types/payment";
 
 export const columns: ColumnDef<Payment>[] = [
@@ -20,6 +19,10 @@ export const columns: ColumnDef<Payment>[] = [
         </Button>
       );
     },
+  },
+  {
+    accessorKey: "order.customer.name",
+    header: "Cliente",
   },
   {
     accessorKey: "description",
@@ -50,7 +53,7 @@ export const columns: ColumnDef<Payment>[] = [
     cell: ({ row }) => {
       const status = row.getValue("status") as boolean;
       return (
-        <Badge variant={status ? "default" : "destructive"}>
+        <Badge variant={status ? "default" : "secondary"}>
           {status ? "Ativo" : "Inativo"}
         </Badge>
       );
@@ -62,21 +65,14 @@ export const columns: ColumnDef<Payment>[] = [
       const navigate = useNavigate();
       const payment = row.original;
 
-      const handleDelete = () => {
-        toast.success("Pagamento excluído com sucesso!");
-      };
-
       return (
         <div className="flex gap-2">
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate(`/financial/payments/${payment.id}/edit`)}
+            onClick={() => navigate(`/financial/payments/${payment.id}`)}
           >
-            <Pencil className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={handleDelete}>
-            <Trash2 className="h-4 w-4" />
+            <Eye className="h-4 w-4" />
           </Button>
         </div>
       );
