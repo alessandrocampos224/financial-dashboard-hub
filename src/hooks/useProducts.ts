@@ -27,7 +27,7 @@ export function useProducts() {
   });
 
   const createMutation = useMutation({
-    mutationFn: async (product: Partial<Product>) => {
+    mutationFn: async (product: Pick<Product, "code" | "name" | "price"> & Partial<Omit<Product, "code" | "name" | "price">>) => {
       console.log("Criando produto:", product);
       const { data, error } = await supabase
         .from("products")
