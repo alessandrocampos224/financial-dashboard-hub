@@ -61,15 +61,14 @@ export default function CustomerForm() {
         console.log("Iniciando criação do cliente...");
         console.log("Dados do formulário:", data);
         
-        // 1. Verificar se o usuário já existe
-        const { data: existingUser, error: checkError } = await supabase
-          .from("profiles")
-          .select("id")
-          .eq("email", data.email)
-          .maybeSingle();
+        // 1. Verificar se o usuário já existe no Auth
+        const { data: authUser, error: authCheckError } = await supabase.auth.signInWithPassword({
+          email: data.email,
+          password: data.password,
+        });
 
-        if (existingUser) {
-          throw new Error("Um usuário com este email já existe.");
+        if (authUser?.user) {
+          throw new Error("Um usuário com este email já existe no sistema.");
         }
 
         // 2. Criar o usuário no auth
