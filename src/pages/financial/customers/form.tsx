@@ -19,7 +19,6 @@ export default function CustomerForm() {
   const isEditing = !!id;
   const queryClient = useQueryClient();
 
-  // Buscar dados do cliente se estiver editando
   const { data: customer, isLoading } = useQuery({
     queryKey: ["customer", id],
     queryFn: async () => {
@@ -39,16 +38,8 @@ export default function CustomerForm() {
   const form = useForm<CustomerFormValues>({
     resolver: zodResolver(customerFormSchema),
     defaultValues: {
-      type: "customer",
       name: customer?.name || "",
-      fantasia: "",
-      document: "",
-      rg: "",
-      ie: "ISENTO",
-      phone: "",
-      email: "",
-      password: "",
-      roles_id: "",
+      email: customer?.email || "",
       description: "",
       status: true,
     },
@@ -57,13 +48,11 @@ export default function CustomerForm() {
   // Mutation para criar cliente
   const createMutation = useMutation({
     mutationFn: async (data: CustomerFormValues) => {
-      const { error } = await supabase.from("profiles").insert([
-        {
-          name: data.name,
-          email: data.email,
-          tenant_id: "1", // Você pode ajustar isso conforme necessário
-        },
-      ]);
+      const { error } = await supabase.from("profiles").insert({
+        name: data.name,
+        email: data.email,
+        tenant_id: "1", // Você pode ajustar isso conforme necessário
+      });
 
       if (error) throw error;
     },

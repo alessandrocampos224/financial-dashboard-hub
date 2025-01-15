@@ -5,6 +5,7 @@ import { DataTable } from "./data-table";
 import { columns } from "./columns";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Customer } from "@/types/customer";
 
 export default function CustomersPage() {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ export default function CustomersPage() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data as Customer[];
     },
   });
 
