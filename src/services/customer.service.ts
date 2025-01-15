@@ -7,23 +7,16 @@ export const customerService = {
     try {
       console.log('Verificando existência do usuário:', email);
       
-      // Verificar na tabela de profiles
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('email', email)
-        .maybeSingle();
+      const { data, error } = await supabase.functions.invoke('check-user-exists', {
+        body: { email }
+      });
 
-      if (profileError) {
-        console.error('Erro ao verificar perfil existente:', profileError);
-        throw profileError;
+      if (error) {
+        console.error('Erro ao verificar usuário:', error);
+        throw error;
       }
 
-      // Se encontrou um perfil, o usuário já existe
-      const userExists = !!profileData;
-      console.log('Usuário existe?', userExists);
-      
-      return userExists;
+      return data.exists;
     } catch (error) {
       console.error('Erro ao verificar usuário:', error);
       throw error;
