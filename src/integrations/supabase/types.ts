@@ -9,6 +9,112 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      order_items: {
+        Row: {
+          amount: number | null
+          created_at: string | null
+          id: string
+          order_id: string | null
+          product_id: string | null
+          quantity: number | null
+          status: boolean | null
+          unitary: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string | null
+          id?: string
+          order_id?: string | null
+          product_id?: string | null
+          quantity?: number | null
+          status?: boolean | null
+          unitary?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string | null
+          id?: string
+          order_id?: string | null
+          product_id?: string | null
+          quantity?: number | null
+          status?: boolean | null
+          unitary?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          amount: number | null
+          created_at: string | null
+          customer_id: string | null
+          deleted_at: string | null
+          description: string | null
+          discount: number | null
+          id: string
+          interest: number | null
+          invoice: string | null
+          price: number | null
+          status: boolean | null
+          tenant_id: string | null
+          type: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string | null
+          customer_id?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          discount?: number | null
+          id?: string
+          interest?: number | null
+          invoice?: string | null
+          price?: number | null
+          status?: boolean | null
+          tenant_id?: string | null
+          type?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string | null
+          customer_id?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          discount?: number | null
+          id?: string
+          interest?: number | null
+          invoice?: string | null
+          price?: number | null
+          status?: boolean | null
+          tenant_id?: string | null
+          type?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null

@@ -2,7 +2,6 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, Eye, Pencil, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Order } from "@/types/order";
 import { format, isToday } from "date-fns";
@@ -54,7 +53,12 @@ export const columns: ColumnDef<Order>[] = [
 
       const handleDelete = async () => {
         try {
-          // Aqui virá a lógica de deleção usando o Supabase
+          const { error } = await supabase
+            .from("orders")
+            .delete()
+            .eq("id", order.id);
+
+          if (error) throw error;
           toast.success("Venda excluída com sucesso!");
         } catch (error) {
           toast.error("Erro ao excluir venda");

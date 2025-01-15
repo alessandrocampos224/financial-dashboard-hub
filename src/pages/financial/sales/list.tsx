@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -16,7 +15,13 @@ export default function SalesListPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("orders")
-        .select("*, customer:profiles(name, email)")
+        .select(`
+          *,
+          customer:profiles!orders_customer_id_fkey (
+            name,
+            email
+          )
+        `)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
