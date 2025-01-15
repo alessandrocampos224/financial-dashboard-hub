@@ -21,24 +21,8 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { Item } from "@/types/item";
 import { Product } from "@/types/product";
-
-// Mock de produtos para exemplo
-const mockProducts: Product[] = [
-  {
-    id: "1",
-    tenant_id: "1",
-    code: "PROD001",
-    name: "iPhone 15",
-    subtitle: "128GB Preto",
-    price: 5999.99,
-    status: true,
-    categories_id: "1",
-    brands_id: "1",
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  // Adicione mais produtos mock aqui
-];
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function SalesPage() {
   const { toast } = useToast();
@@ -46,7 +30,27 @@ export default function SalesPage() {
   const [items, setItems] = useState<Item[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  const filteredProducts = mockProducts.filter(
+  // Buscar produtos do Supabase
+  const { data: products = [], isLoading } = useQuery({
+    queryKey: ["products"],
+    queryFn: async () => {
+      console.log("Buscando produtos...");
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .eq("status", true);
+
+      if (error) {
+        console.error("Erro ao buscar produtos:", error);
+        throw error;
+      }
+
+      console.log("Produtos encontrados:", data);
+      return data || [];
+    },
+  });
+
+  const filteredProducts = products.filter(
     (product) =>
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.code.toLowerCase().includes(searchTerm.toLowerCase())
@@ -142,26 +146,34 @@ export default function SalesPage() {
 
             {searchTerm && (
               <div className="border rounded-md mt-2">
-                {filteredProducts.map((product) => (
-                  <div
-                    key={product.id}
-                    className="p-2 hover:bg-accent cursor-pointer flex justify-between items-center"
-                    onClick={() => addItem(product)}
-                  >
-                    <div>
-                      <p className="font-medium">{product.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {product.code}
+                {isLoading ? (
+                  <div className="p-4 text-center">Carregando produtos...</div>
+                ) : filteredProducts.length > 0 ? (
+                  filteredProducts.map((product) => (
+                    <div
+                      key={product.id}
+                      className="p-2 hover:bg-accent cursor-pointer flex justify-between items-center"
+                      onClick={() => addItem(product)}
+                    >
+                      <div>
+                        <p className="font-medium">{product.name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {product.code}
+                        </p>
+                      </div>
+                      <p className="font-medium">
+                        {product.price.toLocaleString("pt-BR", {
+                          style: "currency",
+                          currency: "BRL",
+                        })}
                       </p>
                     </div>
-                    <p className="font-medium">
-                      {product.price.toLocaleString("pt-BR", {
-                        style: "currency",
-                        currency: "BRL",
-                      })}
-                    </p>
+                  ))
+                ) : (
+                  <div className="p-4 text-center text-muted-foreground">
+                    Nenhum produto encontrado
                   </div>
-                ))}
+                )}
               </div>
             )}
           </div>
