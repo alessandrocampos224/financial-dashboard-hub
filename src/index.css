@@ -33,7 +33,7 @@
     --card-foreground: 210 40% 98%;
     --popover: 220 20% 12%;
     --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
     --primary-foreground: 222.2 47.4% 11.2%;
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
@@ -84,14 +84,34 @@
 
 @layer components {
   .table-header {
-    @apply bg-background border-b border-border;
+    @apply bg-background border-b border-border dark:bg-secondary/50;
   }
   
   .table-row {
-    @apply hover:bg-muted/50 transition-colors;
+    @apply hover:bg-muted/50 dark:hover:bg-secondary/80 transition-colors;
   }
   
   .table-cell {
-    @apply p-4 align-middle [&:has([role=checkbox])]:pr-0;
+    @apply p-4 align-middle [&:has([role=checkbox])]:pr-0 dark:text-foreground;
+  }
+
+  .dark .table-header th {
+    @apply text-foreground/90 bg-secondary/50;
+  }
+
+  .dark .table-row {
+    @apply border-border/50;
+  }
+
+  .dark .table-row:hover {
+    @apply bg-secondary/80;
+  }
+
+  .dark .table-cell {
+    @apply text-foreground/90;
+  }
+
+  .dark .table-row td {
+    @apply border-border/50;
   }
 }
