@@ -24,7 +24,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Erro ao buscar perfil:', error);
@@ -41,13 +41,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Função para atualizar o usuário com seu perfil
     async function updateUserWithProfile(session: { user: User } | null) {
-      if (session?.user) {
-        const profile = await getProfile(session.user.id);
-        setUser({ ...session.user, profile });
-      } else {
+      try {
+        if (session?.user) {
+          const profile = await getProfile(session.user.id);
+          setUser({ ...session.user, profile });
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        console.error('Erro ao atualizar perfil do usuário:', error);
         setUser(null);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
 
     // Verificar sessão inicial
