@@ -11,6 +11,7 @@ import DashboardPage from "./pages/dashboard";
 import { InventoryRoutes } from "./routes/inventory.routes";
 import { FinancialRoutes } from "./routes/financial.routes";
 import { SettingsRoutes } from "./routes/settings.routes";
+import { OperationalRoutes } from "./routes/operational.routes";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +41,7 @@ const App = () => {
                   {InventoryRoutes}
                   {FinancialRoutes}
                   {SettingsRoutes}
+                  {OperationalRoutes}
                 </Route>
               </Routes>
               <Toaster />
