@@ -64,10 +64,10 @@ export default function SalesForm() {
         .from("orders")
         .insert({
           customer_id: selectedCustomer.id,
-          user_id: user.id, // Adicionando o user_id do usuário logado
+          user_id: user.id,
           amount: total,
           price: total,
-          status: true,
+          status: true, // Venda em aberto
         })
         .select()
         .single();
@@ -94,7 +94,8 @@ export default function SalesForm() {
         description: "Venda realizada com sucesso",
       });
 
-      navigate("/financial/sales");
+      // Redireciona para o formulário de pagamento com o ID da venda
+      navigate(`/financial/payments/new?order_id=${order.id}`);
     } catch (error) {
       console.error(error);
       toast({

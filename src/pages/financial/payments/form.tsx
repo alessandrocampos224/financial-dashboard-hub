@@ -22,6 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { Card } from "@/components/ui/card";
 
 interface FormData {
   amount: number;
@@ -141,6 +142,10 @@ export default function PaymentForm() {
     }
   };
 
+  const handleCancel = () => {
+    navigate('/financial/sales');
+  };
+
   return (
     <div className="container mx-auto py-10">
       <div className="mb-8">
@@ -148,7 +153,7 @@ export default function PaymentForm() {
       </div>
 
       {orderDetails && (
-        <div className="bg-muted p-4 rounded-lg mb-6">
+        <Card className="bg-muted p-4 rounded-lg mb-6">
           <h3 className="font-semibold mb-2">Detalhes da Venda</h3>
           <p className="text-lg mb-2">
             Cliente: {orderDetails.customer?.name}
@@ -159,7 +164,7 @@ export default function PaymentForm() {
               currency: "BRL",
             })}
           </p>
-        </div>
+        </Card>
       )}
 
       <Form {...form}>
@@ -228,13 +233,13 @@ export default function PaymentForm() {
           />
 
           <div className="flex gap-4">
-            <Button type="submit">Salvar</Button>
+            <Button type="submit">Registrar Pagamento</Button>
             <Button
               type="button"
               variant="outline"
-              onClick={() => navigate("/financial/sales")}
+              onClick={handleCancel}
             >
-              Cancelar
+              Voltar para Vendas
             </Button>
           </div>
         </form>
