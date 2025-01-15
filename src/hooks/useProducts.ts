@@ -3,6 +3,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Product } from "@/types/product";
 
+// Função auxiliar para validar UUID
+const isValidUUID = (uuid: string) => {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
+};
+
 export function useProducts() {
   const queryClient = useQueryClient();
 
@@ -29,9 +35,17 @@ export function useProducts() {
   const createMutation = useMutation({
     mutationFn: async (product: Pick<Product, "code" | "name" | "price"> & Partial<Omit<Product, "code" | "name" | "price">>) => {
       console.log("Criando produto:", product);
+      
+      // Remove category_id e brand_id se não forem UUIDs válidos
+      const cleanProduct = {
+        ...product,
+        category_id: product.category_id && isValidUUID(product.category_id) ? product.category_id : undefined,
+        brand_id: product.brand_id && isValidUUID(product.brand_id) ? product.brand_id : undefined,
+      };
+
       const { data, error } = await supabase
         .from("products")
-        .insert([product])
+        .insert([cleanProduct])
         .select()
         .single();
 
