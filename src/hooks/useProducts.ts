@@ -26,6 +26,32 @@ export function useProducts() {
     },
   });
 
+  const createMutation = useMutation({
+    mutationFn: async (product: Partial<Product>) => {
+      console.log("Criando produto:", product);
+      const { data, error } = await supabase
+        .from("products")
+        .insert([product])
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Erro ao criar produto:", error);
+        throw error;
+      }
+
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      toast.success("Produto criado com sucesso!");
+    },
+    onError: (error: Error) => {
+      console.error("Erro ao criar produto:", error);
+      toast.error(`Erro ao criar produto: ${error.message}`);
+    },
+  });
+
   const deleteMutation = useMutation({
     mutationFn: async (productId: string) => {
       console.log("Iniciando exclusão do produto:", productId);
@@ -52,6 +78,8 @@ export function useProducts() {
   return {
     products,
     isLoading,
+    createProduct: createMutation.mutate,
+    isCreatingProduct: createMutation.isPending,
     deleteProduct: deleteMutation.mutate,
     isDeletingProduct: deleteMutation.isPending,
   };
