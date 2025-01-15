@@ -60,7 +60,7 @@ export default function PermissionsPage() {
   return (
     <div className="container mx-auto py-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Permissões</h1>
+        <h1 className="text-2xl font-bold text-foreground">Permissões</h1>
         <Button onClick={() => navigate("/settings/permissions/new")}>
           <Plus className="mr-2 h-4 w-4" /> Nova Permissão
         </Button>
@@ -71,38 +71,38 @@ export default function PermissionsPage() {
           placeholder="Buscar permissões..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-sm"
+          className="max-w-sm bg-background text-foreground"
         />
       </div>
 
-      <div className="border rounded-lg">
+      <div className="border rounded-lg border-border">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>Nome</TableHead>
-              <TableHead>Alias</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Criado em</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
+            <TableRow className="hover:bg-muted/50">
+              <TableHead className="text-foreground">Nome</TableHead>
+              <TableHead className="text-foreground">Alias</TableHead>
+              <TableHead className="text-foreground">Status</TableHead>
+              <TableHead className="text-foreground">Criado em</TableHead>
+              <TableHead className="text-right text-foreground">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredPermissions.map((permission) => (
-              <TableRow key={permission.id}>
-                <TableCell>{permission.name}</TableCell>
-                <TableCell>{permission.alias}</TableCell>
+              <TableRow key={permission.id} className="hover:bg-muted/50">
+                <TableCell className="text-foreground">{permission.name}</TableCell>
+                <TableCell className="text-foreground">{permission.alias}</TableCell>
                 <TableCell>
                   <span
                     className={`px-2 py-1 rounded-full text-xs ${
                       permission.status
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
+                        ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                        : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
                     }`}
                   >
                     {permission.status ? "Ativo" : "Inativo"}
                   </span>
                 </TableCell>
-                <TableCell>
+                <TableCell className="text-foreground">
                   {new Date(permission.created_at).toLocaleDateString()}
                 </TableCell>
                 <TableCell className="text-right">
@@ -112,6 +112,7 @@ export default function PermissionsPage() {
                     onClick={() =>
                       navigate(`/settings/permissions/${permission.id}/edit`)
                     }
+                    className="text-foreground hover:text-primary"
                   >
                     <Pencil className="h-4 w-4" />
                   </Button>
@@ -119,6 +120,7 @@ export default function PermissionsPage() {
                     variant="ghost"
                     size="icon"
                     onClick={() => handleDelete(permission.id)}
+                    className="text-foreground hover:text-destructive"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
