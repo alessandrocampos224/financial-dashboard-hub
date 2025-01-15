@@ -1,6 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
 import { CustomerFormValues } from "@/pages/financial/customers/schema";
-import { User } from "@supabase/supabase-js";
 
 export const customerService = {
   async checkExistingUser(email: string) {
@@ -14,29 +13,16 @@ export const customerService = {
         .eq('email', email)
         .maybeSingle();
 
-      if (profileError && profileError.code !== 'PGRST116') {
+      if (profileError) {
         console.error('Erro ao verificar perfil existente:', profileError);
         throw profileError;
       }
 
       // Se encontrou um perfil, o usuário já existe
-      if (profileData) {
-        console.log('Usuário encontrado no profiles:', profileData);
-        return true;
-      }
-
-      // Verificar diretamente com o auth
-      const { data, error: authError } = await supabase.auth.admin.listUsers();
+      const userExists = !!profileData;
+      console.log('Usuário existe?', userExists);
       
-      if (authError) {
-        console.error('Erro ao verificar usuários no auth:', authError);
-        throw authError;
-      }
-
-      const userExists = data.users.some((user: User) => user.email === email);
-      console.log('Usuário existe no auth?', userExists);
-      
-      return !!userExists;
+      return userExists;
     } catch (error) {
       console.error('Erro ao verificar usuário:', error);
       throw error;
