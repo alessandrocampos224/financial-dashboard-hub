@@ -56,26 +56,30 @@ export const columns: ColumnDef<Customer>[] = [
 
       const deleteMutation = useMutation({
         mutationFn: async () => {
-          console.log("Tentando excluir cliente:", customer.id);
-          const { error } = await supabase
+          console.log("Iniciando processo de exclusão do cliente:", customer.id);
+          
+          const { data, error } = await supabase
             .from("profiles")
             .delete()
-            .eq("id", customer.id);
+            .eq("id", customer.id)
+            .select()
+            .single();
 
           if (error) {
             console.error("Erro ao deletar perfil:", error);
             throw error;
           }
 
-          return { success: true };
+          console.log("Cliente excluído com sucesso:", data);
+          return data;
         },
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ["customers"] });
           toast.success("Cliente excluído com sucesso!");
         },
         onError: (error) => {
-          console.error("Erro ao excluir cliente:", error);
-          toast.error("Erro ao excluir cliente");
+          console.error("Erro completo ao excluir cliente:", error);
+          toast.error("Erro ao excluir cliente. Por favor, tente novamente.");
         },
       });
 
