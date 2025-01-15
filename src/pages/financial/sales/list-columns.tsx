@@ -61,6 +61,8 @@ export const columns: ColumnDef<Order>[] = [
 
           if (error) throw error;
           toast.success("Venda excluída com sucesso!");
+          // Recarregar a página para atualizar a lista
+          window.location.reload();
         } catch (error) {
           toast.error("Erro ao excluir venda");
         }

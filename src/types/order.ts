@@ -1,9 +1,9 @@
 export interface Order {
   id: string;
-  tenant_id: string;
+  tenant_id: string | null;
   invoice: string | null;
   type: string | null;
-  user_id: string;
+  user_id: string | null;
   customer_id: string | null;
   interest: number | null;
   discount: number | null;

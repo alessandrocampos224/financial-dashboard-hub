@@ -9,6 +9,141 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      brands: {
+        Row: {
+          cover: string | null
+          created_at: string | null
+          deleted_at: string | null
+          description: string | null
+          id: string
+          name: string
+          status: boolean | null
+          tenant_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          cover?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          status?: boolean | null
+          tenant_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          cover?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          status?: boolean | null
+          tenant_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      carriers: {
+        Row: {
+          city: string | null
+          created_at: string | null
+          deleted_at: string | null
+          district: string | null
+          document: string | null
+          email: string | null
+          id: string
+          ie: string | null
+          name: string
+          number: string | null
+          phone: string | null
+          state: string | null
+          status: boolean | null
+          street: string | null
+          tenant_id: string | null
+          updated_at: string | null
+          zip: string | null
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          district?: string | null
+          document?: string | null
+          email?: string | null
+          id?: string
+          ie?: string | null
+          name: string
+          number?: string | null
+          phone?: string | null
+          state?: string | null
+          status?: boolean | null
+          street?: string | null
+          tenant_id?: string | null
+          updated_at?: string | null
+          zip?: string | null
+        }
+        Update: {
+          city?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          district?: string | null
+          document?: string | null
+          email?: string | null
+          id?: string
+          ie?: string | null
+          name?: string
+          number?: string | null
+          phone?: string | null
+          state?: string | null
+          status?: boolean | null
+          street?: string | null
+          tenant_id?: string | null
+          updated_at?: string | null
+          zip?: string | null
+        }
+        Relationships: []
+      }
+      categories: {
+        Row: {
+          cover: string | null
+          created_at: string | null
+          deleted_at: string | null
+          description: string | null
+          id: string
+          name: string
+          status: boolean | null
+          tenant_id: string | null
+          updated_at: string | null
+          url: string
+        }
+        Insert: {
+          cover?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          status?: boolean | null
+          tenant_id?: string | null
+          updated_at?: string | null
+          url: string
+        }
+        Update: {
+          cover?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          status?: boolean | null
+          tenant_id?: string | null
+          updated_at?: string | null
+          url?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           amount: number | null
@@ -115,6 +250,126 @@ export type Database = {
           },
         ]
       }
+      permissions: {
+        Row: {
+          alias: string
+          created_at: string | null
+          deleted_at: string | null
+          description: string | null
+          id: string
+          name: string
+          role_id: string | null
+          status: boolean | null
+          tenant_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          alias: string
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          role_id?: string | null
+          status?: boolean | null
+          tenant_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          alias?: string
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          role_id?: string | null
+          status?: boolean | null
+          tenant_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          amount: number | null
+          brand_id: string | null
+          category_id: string | null
+          code: string
+          cover: string | null
+          created_at: string | null
+          deleted_at: string | null
+          description: string | null
+          id: string
+          interest: number | null
+          name: string
+          price: number
+          status: boolean | null
+          stock: number | null
+          subtitle: string | null
+          tenant_id: string | null
+          type: number | null
+          updated_at: string | null
+          weight: number | null
+        }
+        Insert: {
+          amount?: number | null
+          brand_id?: string | null
+          category_id?: string | null
+          code: string
+          cover?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          id?: string
+          interest?: number | null
+          name: string
+          price?: number
+          status?: boolean | null
+          stock?: number | null
+          subtitle?: string | null
+          tenant_id?: string | null
+          type?: number | null
+          updated_at?: string | null
+          weight?: number | null
+        }
+        Update: {
+          amount?: number | null
+          brand_id?: string | null
+          category_id?: string | null
+          code?: string
+          cover?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          id?: string
+          interest?: number | null
+          name?: string
+          price?: number
+          status?: boolean | null
+          stock?: number | null
+          subtitle?: string | null
+          tenant_id?: string | null
+          type?: number | null
+          updated_at?: string | null
+          weight?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -142,6 +397,45 @@ export type Database = {
           name?: string | null
           tenant_id?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      roles: {
+        Row: {
+          alias: string
+          created_at: string | null
+          deleted_at: string | null
+          description: string | null
+          id: string
+          is_admin: boolean | null
+          name: string
+          status: boolean | null
+          tenant_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          alias: string
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          id?: string
+          is_admin?: boolean | null
+          name: string
+          status?: boolean | null
+          tenant_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          alias?: string
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          id?: string
+          is_admin?: boolean | null
+          name?: string
+          status?: boolean | null
+          tenant_id?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }

@@ -6,6 +6,7 @@ import { columns } from "./list-columns";
 import { Order } from "@/types/order";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export default function SalesListPage() {
   const navigate = useNavigate();
@@ -24,14 +25,14 @@ export default function SalesListPage() {
         `)
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        toast.error("Erro ao carregar vendas");
+        throw error;
+      }
+
       return data as Order[];
     },
   });
-
-  if (isLoading) {
-    return <div>Carregando...</div>;
-  }
 
   return (
     <div className="container mx-auto py-10">
@@ -42,7 +43,11 @@ export default function SalesListPage() {
           Nova Venda
         </Button>
       </div>
-      <DataTable columns={columns} data={orders} />
+      {isLoading ? (
+        <div>Carregando...</div>
+      ) : (
+        <DataTable columns={columns} data={orders} />
+      )}
     </div>
   );
 }
