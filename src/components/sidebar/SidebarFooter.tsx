@@ -11,7 +11,7 @@ export function SidebarFooter({ collapsed }: SidebarFooterProps) {
 
   return (
     <div className="p-4 border-t border-gray-200">
-      <button onClick={logout} className="nav-link w-full">
+      <button onClick={logout} className="nav-link w-full flex items-center gap-2">
         <LogOut className="h-5 w-5" />
         <span className={cn("transition-opacity", collapsed ? "opacity-0 hidden" : "opacity-100")}>
           Sair
