@@ -9,12 +9,20 @@ interface SidebarHeaderProps {
 export function SidebarHeader({ collapsed, setCollapsed }: SidebarHeaderProps) {
   return (
     <div className="flex items-center justify-between h-16 px-4 border-b border-border">
-      <h1 className={cn("font-semibold transition-opacity", collapsed ? "opacity-0" : "opacity-100")}>
+      <h1 
+        className={cn(
+          "font-semibold transition-all duration-300",
+          collapsed ? "opacity-0 w-0" : "opacity-100 w-auto"
+        )}
+      >
         Sistema
       </h1>
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gdrive-hover transition-colors"
+        className={cn(
+          "p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gdrive-hover transition-colors",
+          "flex items-center justify-center"
+        )}
       >
         {collapsed ? (
           <ChevronRight className="h-5 w-5 text-foreground" />
