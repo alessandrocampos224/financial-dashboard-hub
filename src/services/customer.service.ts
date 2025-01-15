@@ -4,27 +4,20 @@ import { CustomerFormValues } from "@/pages/financial/customers/schema";
 export const customerService = {
   async checkExistingUser(email: string) {
     try {
-      // Primeiro, verificar na tabela auth.users
-      const { data: authData, error: authError } = await supabase.auth.admin.listUsers();
+      console.log('Verificando existência do usuário:', email);
       
-      if (authError) {
-        console.error('Erro ao verificar usuários existentes:', authError);
-        // Se não conseguir verificar no auth, tentar na tabela de profiles
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('id, email')
-          .eq('email', email)
-          .maybeSingle();
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('id, email')
+        .eq('email', email)
+        .maybeSingle();
 
-        if (profileError) {
-          console.error('Erro ao verificar perfil existente:', profileError);
-        }
-        
-        return !!profileData;
+      if (profileError) {
+        console.error('Erro ao verificar perfil existente:', profileError);
+        throw profileError;
       }
       
-      // Verificar se o email já existe em algum usuário
-      return authData.users.some(user => user.email === email);
+      return !!profileData;
     } catch (error) {
       console.error('Erro ao verificar usuário:', error);
       return false;
@@ -111,11 +104,6 @@ export const customerService = {
 
       if (profileError) {
         console.error('Erro ao atualizar perfil:', profileError);
-        // Tentar remover o usuário auth se falhar ao atualizar o perfil
-        const { error: deleteError } = await supabase.auth.admin.deleteUser(authData.user.id);
-        if (deleteError) {
-          console.error('Erro ao deletar usuário após falha na atualização do perfil:', deleteError);
-        }
         throw profileError;
       }
 
