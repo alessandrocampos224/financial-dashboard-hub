@@ -29,10 +29,9 @@ export function useCustomers() {
     mutationFn: async (customerId: string) => {
       console.log("Iniciando exclusão do cliente:", customerId);
       
-      const { error } = await supabase
-        .from("profiles")
-        .delete()
-        .eq("id", customerId);
+      const { error } = await supabase.functions.invoke('delete-profile', {
+        body: { profileId: customerId }
+      });
 
       if (error) {
         console.error("Erro ao excluir cliente:", error);
