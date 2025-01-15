@@ -176,37 +176,40 @@ export default function OperationalSettings() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 bg-gdrive-background min-h-screen">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Configurações Operacionais</h1>
-        <Button onClick={handleCreate}>
+        <h1 className="text-2xl font-bold text-gdrive-text">Configurações Operacionais</h1>
+        <Button onClick={handleCreate} variant="outline" className="bg-gdrive-surface text-gdrive-text hover:bg-gdrive-hover">
           <Plus className="h-4 w-4 mr-2" />
           Novo Tenant
         </Button>
       </div>
 
-      <div className="border rounded-lg">
+      <div className="border border-gdrive-border rounded-lg overflow-hidden">
         <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nome</TableHead>
-              <TableHead>Nome Fantasia</TableHead>
-              <TableHead>CNPJ/CPF</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Telefone</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Ações</TableHead>
+          <TableHeader className="bg-gdrive-surface">
+            <TableRow className="border-gdrive-border hover:bg-gdrive-hover">
+              <TableHead className="text-gdrive-text">Nome</TableHead>
+              <TableHead className="text-gdrive-text">Nome Fantasia</TableHead>
+              <TableHead className="text-gdrive-text">CNPJ/CPF</TableHead>
+              <TableHead className="text-gdrive-text">Email</TableHead>
+              <TableHead className="text-gdrive-text">Telefone</TableHead>
+              <TableHead className="text-gdrive-text">Status</TableHead>
+              <TableHead className="text-gdrive-text">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {tenants?.map((tenant) => (
-              <TableRow key={tenant.id}>
-                <TableCell>{tenant.name}</TableCell>
-                <TableCell>{tenant.fantasia}</TableCell>
-                <TableCell>{tenant.document}</TableCell>
-                <TableCell>{tenant.email}</TableCell>
-                <TableCell>{tenant.phone}</TableCell>
-                <TableCell>
+              <TableRow 
+                key={tenant.id} 
+                className="border-gdrive-border hover:bg-gdrive-hover"
+              >
+                <TableCell className="text-gdrive-text">{tenant.name}</TableCell>
+                <TableCell className="text-gdrive-text">{tenant.fantasia}</TableCell>
+                <TableCell className="text-gdrive-text">{tenant.document}</TableCell>
+                <TableCell className="text-gdrive-text">{tenant.email}</TableCell>
+                <TableCell className="text-gdrive-text">{tenant.phone}</TableCell>
+                <TableCell className="text-gdrive-text">
                   <span
                     className={`px-2 py-1 rounded-full text-xs ${
                       tenant.status
@@ -223,6 +226,7 @@ export default function OperationalSettings() {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleEdit(tenant)}
+                      className="text-gdrive-text hover:bg-gdrive-hover"
                     >
                       <Pencil className="h-4 w-4" />
                     </Button>
@@ -230,6 +234,7 @@ export default function OperationalSettings() {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleDelete(tenant)}
+                      className="text-gdrive-text hover:bg-gdrive-hover"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -242,45 +247,48 @@ export default function OperationalSettings() {
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
+        <DialogContent className="bg-gdrive-surface border-gdrive-border">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="text-gdrive-text">
               {selectedTenant ? "Editar Tenant" : "Novo Tenant"}
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Nome</Label>
+              <Label htmlFor="name" className="text-gdrive-text">Nome</Label>
               <Input
                 id="name"
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
                 required
+                className="bg-gdrive-background border-gdrive-border text-gdrive-text"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="fantasia">Nome Fantasia</Label>
+              <Label htmlFor="fantasia" className="text-gdrive-text">Nome Fantasia</Label>
               <Input
                 id="fantasia"
                 name="fantasia"
                 value={formData.fantasia}
                 onChange={handleInputChange}
                 required
+                className="bg-gdrive-background border-gdrive-border text-gdrive-text"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="document">CNPJ/CPF</Label>
+              <Label htmlFor="document" className="text-gdrive-text">CNPJ/CPF</Label>
               <Input
                 id="document"
                 name="document"
                 value={formData.document}
                 onChange={handleInputChange}
                 required
+                className="bg-gdrive-background border-gdrive-border text-gdrive-text"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-gdrive-text">Email</Label>
               <Input
                 id="email"
                 name="email"
@@ -288,23 +296,33 @@ export default function OperationalSettings() {
                 value={formData.email}
                 onChange={handleInputChange}
                 required
+                className="bg-gdrive-background border-gdrive-border text-gdrive-text"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone">Telefone</Label>
+              <Label htmlFor="phone" className="text-gdrive-text">Telefone</Label>
               <Input
                 id="phone"
                 name="phone"
                 value={formData.phone}
                 onChange={handleInputChange}
                 required
+                className="bg-gdrive-background border-gdrive-border text-gdrive-text"
               />
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={handleCloseDialog}>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={handleCloseDialog}
+                className="bg-gdrive-surface text-gdrive-text hover:bg-gdrive-hover"
+              >
                 Cancelar
               </Button>
-              <Button type="submit">
+              <Button 
+                type="submit"
+                className="bg-gdrive-surface text-gdrive-text hover:bg-gdrive-hover"
+              >
                 {selectedTenant ? "Salvar" : "Criar"}
               </Button>
             </DialogFooter>
