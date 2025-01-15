@@ -8,10 +8,10 @@ interface SidebarHeaderProps {
 
 export function SidebarHeader({ collapsed, setCollapsed }: SidebarHeaderProps) {
   return (
-    <div className="flex items-center justify-between h-16 px-4 border-b border-border">
+    <div className="flex items-center h-16 px-4 border-b border-border">
       <h1 
         className={cn(
-          "font-semibold transition-all duration-300",
+          "font-semibold transition-all duration-300 flex-1",
           collapsed ? "opacity-0 w-0" : "opacity-100 w-auto"
         )}
       >
@@ -21,7 +21,7 @@ export function SidebarHeader({ collapsed, setCollapsed }: SidebarHeaderProps) {
         onClick={() => setCollapsed(!collapsed)}
         className={cn(
           "p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gdrive-hover transition-colors",
-          "flex items-center justify-center"
+          "flex items-center justify-center shrink-0"
         )}
       >
         {collapsed ? (
