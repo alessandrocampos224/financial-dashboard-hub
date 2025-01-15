@@ -3,6 +3,7 @@ export interface Payment {
   tenant_id: string;
   safe_id: string;
   user_id: string;
+  order_id: string;
   parcela: number;
   amount: number | null;
   discount: number | null;
@@ -14,4 +15,10 @@ export interface Payment {
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
+  order?: {
+    customer?: {
+      name?: string;
+    };
+    invoice?: string;
+  };
 }
