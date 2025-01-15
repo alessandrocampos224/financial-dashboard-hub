@@ -21,8 +21,8 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
   
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Carregando...</div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-lg animate-pulse">Carregando...</div>
       </div>
     );
   }
