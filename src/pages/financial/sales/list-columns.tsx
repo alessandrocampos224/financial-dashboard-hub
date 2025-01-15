@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Order } from "@/types/order";
-import { format } from "date-fns";
+import { format, isToday } from "date-fns";
 
 export const columns: ColumnDef<Order>[] = [
   {
@@ -46,26 +46,19 @@ export const columns: ColumnDef<Order>[] = [
     },
   },
   {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => {
-      const status = row.getValue("status") as boolean;
-      return (
-        <Badge variant={status ? "default" : "destructive"}>
-          {status ? "Ativo" : "Inativo"}
-        </Badge>
-      );
-    },
-  },
-  {
     id: "actions",
     cell: ({ row }) => {
       const navigate = useNavigate();
       const order = row.original;
-      const isToday = new Date(order.created_at).toDateString() === new Date().toDateString();
+      const isTodaySale = isToday(new Date(order.created_at));
 
-      const handleDelete = () => {
-        toast.success("Venda excluída com sucesso!");
+      const handleDelete = async () => {
+        try {
+          // Aqui virá a lógica de deleção usando o Supabase
+          toast.success("Venda excluída com sucesso!");
+        } catch (error) {
+          toast.error("Erro ao excluir venda");
+        }
       };
 
       return (
@@ -77,7 +70,7 @@ export const columns: ColumnDef<Order>[] = [
           >
             <Eye className="h-4 w-4" />
           </Button>
-          {isToday && (
+          {isTodaySale && (
             <>
               <Button
                 variant="ghost"

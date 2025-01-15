@@ -16,7 +16,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -52,7 +51,7 @@ export const CustomerSelector = ({
         if (error) throw error;
         setCustomers(data || []);
       } catch (error) {
-        console.error("Error fetching customers:", error);
+        console.error("Erro ao buscar clientes:", error);
       } finally {
         setLoading(false);
       }

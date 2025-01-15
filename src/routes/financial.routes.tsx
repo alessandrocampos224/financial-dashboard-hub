@@ -14,10 +14,10 @@ export const FinancialRoutes = (
     <Route path="/financial/customers" element={<CustomersPage />} />
     <Route path="/financial/customers/new" element={<CustomerForm />} />
     <Route path="/financial/customers/:id/edit" element={<CustomerForm />} />
-    <Route path="/financial/sales" element={<SalesPage />} />
+    <Route path="/financial/sales" element={<SaleList />} />
     <Route path="/financial/sales/new" element={<SaleForm />} />
     <Route path="/financial/sales/:id" element={<SaleView />} />
-    <Route path="/financial/sales/list" element={<SaleList />} />
+    <Route path="/financial/sales/:id/edit" element={<SaleForm />} />
     <Route path="/financial/cashier" element={<CashierPage />} />
     <Route path="/financial/payments" element={<PaymentsPage />} />
     <Route path="/financial/payments/new" element={<PaymentForm />} />

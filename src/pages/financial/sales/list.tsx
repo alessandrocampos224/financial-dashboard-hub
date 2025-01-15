@@ -5,34 +5,28 @@ import { useNavigate } from "react-router-dom";
 import { DataTable } from "./data-table";
 import { columns } from "./list-columns";
 import { Order } from "@/types/order";
-
-const mockOrders: Order[] = [
-  {
-    id: "1",
-    tenant_id: "1",
-    invoice: "INV001",
-    type: "sale",
-    user_id: "1",
-    interest: 0,
-    discount: 10,
-    price: 1000,
-    amount: 990,
-    description: "First sale",
-    link: null,
-    status: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    deleted_at: null,
-    customer: {
-      name: "John Doe",
-      email: "john@example.com",
-    },
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function SalesListPage() {
   const navigate = useNavigate();
-  const [orders] = useState<Order[]>(mockOrders);
+
+  const { data: orders = [], isLoading } = useQuery({
+    queryKey: ["sales"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("orders")
+        .select("*, customer:profiles(name, email)")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      return data as Order[];
+    },
+  });
+
+  if (isLoading) {
+    return <div>Carregando...</div>;
+  }
 
   return (
     <div className="container mx-auto py-10">
