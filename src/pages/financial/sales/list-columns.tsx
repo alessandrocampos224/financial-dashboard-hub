@@ -69,12 +69,21 @@ export const columns: ColumnDef<Order>[] = [
 
       const handleDelete = async () => {
         try {
-          const { error } = await supabase
+          // Primeiro, excluir os itens do pedido
+          const { error: itemsError } = await supabase
+            .from("order_items")
+            .delete()
+            .eq("order_id", order.id);
+
+          if (itemsError) throw itemsError;
+
+          // Depois, excluir o pedido
+          const { error: orderError } = await supabase
             .from("orders")
             .delete()
             .eq("id", order.id);
 
-          if (error) throw error;
+          if (orderError) throw orderError;
 
           toast.success("Venda excluída com sucesso!");
           // Recarregar a página para atualizar a lista
