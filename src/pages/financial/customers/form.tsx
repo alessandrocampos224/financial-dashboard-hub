@@ -42,7 +42,6 @@ export default function CustomerForm() {
   const form = useForm<CustomerFormValues>({
     resolver: zodResolver(customerFormSchema),
     defaultValues: {
-      type: "customer",
       name: customer?.name || "",
       fantasia: customer?.fantasia || "",
       document: customer?.document || "",
@@ -81,6 +80,7 @@ export default function CustomerForm() {
           .from("profiles")
           .insert({
             ...data,
+            id: crypto.randomUUID(), // Gerando um UUID para o novo cliente
             type: "customer",
             roles_id: roleData.id,
             tenant_id: user?.profile?.tenant_id || "1",
