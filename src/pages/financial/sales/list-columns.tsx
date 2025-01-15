@@ -1,16 +1,23 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { Order } from "@/types/order";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, DollarSign } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ArrowUpDown, CreditCard, Eye, Pencil } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
+import { Order } from "@/types/order";
 
 export const columns: ColumnDef<Order>[] = [
   {
-    accessorKey: "created_at",
-    header: "Data",
-    cell: ({ row }) => {
-      const date = new Date(row.getValue("created_at"));
-      return date.toLocaleDateString("pt-BR");
+    accessorKey: "id",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Número
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
     },
   },
   {
@@ -22,39 +29,63 @@ export const columns: ColumnDef<Order>[] = [
     header: "Valor",
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("amount"));
-      return new Intl.NumberFormat("pt-BR", {
+      const formatted = new Intl.NumberFormat("pt-BR", {
         style: "currency",
         currency: "BRL",
       }).format(amount);
+      return formatted;
+    },
+  },
+  {
+    accessorKey: "created_at",
+    header: "Data",
+    cell: ({ row }) => {
+      return new Date(row.getValue("created_at")).toLocaleDateString("pt-BR");
     },
   },
   {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      const status = row.getValue("status");
-      return status ? "Em aberto" : "Pago";
+      const status = row.getValue("status") as boolean;
+      return (
+        <Badge variant={status ? "default" : "secondary"}>
+          {status ? "Em Aberto" : "Pago"}
+        </Badge>
+      );
     },
   },
   {
     id: "actions",
     cell: ({ row }) => {
+      const navigate = useNavigate();
       const order = row.original;
-      const isPaid = !order.status;
+      const status = row.getValue("status") as boolean;
 
       return (
         <div className="flex gap-2">
-          <Link to={`/financial/sales/${order.id}`}>
-            <Button variant="ghost" size="icon">
-              <ArrowRight className="h-4 w-4" />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate(`/financial/sales/${order.id}`)}
+          >
+            <Eye className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate(`/financial/sales/${order.id}/edit`)}
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
+          {status && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate(`/financial/payments/new?order_id=${order.id}`)}
+            >
+              <CreditCard className="h-4 w-4" />
             </Button>
-          </Link>
-          {!isPaid && (
-            <Link to={`/financial/payments/new?order_id=${order.id}`}>
-              <Button variant="ghost" size="icon">
-                <DollarSign className="h-4 w-4" />
-              </Button>
-            </Link>
           )}
         </div>
       );
