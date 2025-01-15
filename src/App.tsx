@@ -3,7 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { ThemeProvider } from "next-themes";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
@@ -12,9 +12,15 @@ import { InventoryRoutes } from "./routes/inventory.routes";
 import { FinancialRoutes } from "./routes/financial.routes";
 import { SettingsRoutes } from "./routes/settings.routes";
 import { OperationalRoutes } from "./routes/operational.routes";
-import { useAuth } from "./contexts/AuthContext";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -22,23 +28,23 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-lg animate-pulse">Carregando...</div>
+        <div className="text-lg">Carregando...</div>
       </div>
     );
   }
   
   if (!user) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" replace />;
   }
 
-  return children;
+  return <>{children}</>;
 }
 
 const App = () => {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <BrowserRouter>
-        <QueryClientProvider client={queryClient}>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
           <AuthProvider>
             <TooltipProvider>
               <Routes>
@@ -62,8 +68,8 @@ const App = () => {
               <Sonner />
             </TooltipProvider>
           </AuthProvider>
-        </QueryClientProvider>
-      </BrowserRouter>
+        </BrowserRouter>
+      </QueryClientProvider>
     </ThemeProvider>
   );
 };

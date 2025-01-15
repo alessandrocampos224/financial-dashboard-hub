@@ -374,31 +374,69 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          deleted_at: string | null
+          description: string | null
+          document: string | null
           email: string | null
+          fantasia: string | null
           id: string
+          ie: string | null
           name: string | null
+          password: string | null
+          phone: string | null
+          rg: string | null
+          roles_id: string | null
           tenant_id: string | null
+          type: string
           updated_at: string
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          deleted_at?: string | null
+          description?: string | null
+          document?: string | null
           email?: string | null
+          fantasia?: string | null
           id: string
+          ie?: string | null
           name?: string | null
+          password?: string | null
+          phone?: string | null
+          rg?: string | null
+          roles_id?: string | null
           tenant_id?: string | null
+          type?: string
           updated_at?: string
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
+          deleted_at?: string | null
+          description?: string | null
+          document?: string | null
           email?: string | null
+          fantasia?: string | null
           id?: string
+          ie?: string | null
           name?: string | null
+          password?: string | null
+          phone?: string | null
+          rg?: string | null
+          roles_id?: string | null
           tenant_id?: string | null
+          type?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_roles_id_fkey"
+            columns: ["roles_id"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       roles: {
         Row: {
