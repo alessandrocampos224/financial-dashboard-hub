@@ -55,10 +55,9 @@ export default function CustomerForm() {
   const createMutation = useMutation({
     mutationFn: async (data: CustomerFormValues) => {
       try {
-        // Gerar um novo UUID para o cliente
+        console.log("Iniciando criação do cliente...");
         const newId = crypto.randomUUID();
         
-        // Primeiro, buscar o ID do perfil 'customer'
         const { data: roleData, error: roleError } = await supabase
           .from("roles")
           .select("id")
@@ -70,19 +69,28 @@ export default function CustomerForm() {
           throw roleError;
         }
 
-        const { error } = await supabase.from("profiles").insert({
+        console.log("Role encontrada:", roleData);
+
+        const newCustomer = {
           id: newId,
           ...data,
           type: "customer",
           roles_id: roleData.id,
-          tenant_id: "1", // Você pode ajustar isso conforme necessário
-        });
+          tenant_id: "1",
+        };
+
+        console.log("Dados a serem inseridos:", newCustomer);
+
+        const { error } = await supabase
+          .from("profiles")
+          .insert(newCustomer);
 
         if (error) {
           console.error("Erro ao criar cliente:", error);
           throw error;
         }
 
+        console.log("Cliente criado com sucesso!");
         return newId;
       } catch (error) {
         console.error("Erro completo:", error);
@@ -125,6 +133,7 @@ export default function CustomerForm() {
   });
 
   const onSubmit = async (data: CustomerFormValues) => {
+    console.log("Dados do formulário:", data);
     if (isEditing) {
       updateMutation.mutate(data);
     } else {
