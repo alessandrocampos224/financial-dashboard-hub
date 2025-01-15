@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Order } from "@/types/order";
 import { format, isToday } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
 
 export const columns: ColumnDef<Order>[] = [
   {

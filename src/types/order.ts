@@ -4,12 +4,12 @@ export interface Order {
   invoice: string | null;
   type: string | null;
   user_id: string;
+  customer_id: string | null;
   interest: number | null;
   discount: number | null;
   price: number | null;
   amount: number | null;
   description: string | null;
-  link: string | null;
   status: boolean;
   created_at: string;
   updated_at: string;
