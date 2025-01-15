@@ -3,11 +3,22 @@ import { supabase } from "@/integrations/supabase/client";
 export const profileService = {
   async createProfile(userId: string, data: { name?: string; email?: string; avatar_url?: string }) {
     try {
+      // Primeiro, buscar o ID do perfil 'customer'
+      const { data: roleData, error: roleError } = await supabase
+        .from("roles")
+        .select("id")
+        .eq("alias", "customer")
+        .single();
+
+      if (roleError) throw roleError;
+
       const { error } = await supabase
         .from('profiles')
         .insert([
           {
             id: userId,
+            roles_id: roleData.id,
+            type: 'customer',
             ...data
           }
         ]);
