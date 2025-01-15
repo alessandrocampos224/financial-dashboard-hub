@@ -1,6 +1,7 @@
-import { Minus, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Item } from "@/types/item";
+import { Minus, Plus, Trash2 } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -9,14 +10,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Item } from "@/types/item";
 
 interface OrderSummaryProps {
   items: Item[];
@@ -24,15 +17,17 @@ interface OrderSummaryProps {
   removeItem: (itemId: string) => void;
   total: number;
   selectedCustomer: any;
+  onSave: () => void;
 }
 
-export const OrderSummary = ({
+export function OrderSummary({
   items,
   updateQuantity,
   removeItem,
   total,
   selectedCustomer,
-}: OrderSummaryProps) => {
+  onSave,
+}: OrderSummaryProps) {
   return (
     <Card className="p-4">
       <div className="space-y-4">
@@ -106,20 +101,12 @@ export const OrderSummary = ({
             </span>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <Select>
-              <SelectTrigger>
-                <SelectValue placeholder="Forma de Pagamento" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="money">Dinheiro</SelectItem>
-                <SelectItem value="credit">Cartão de Crédito</SelectItem>
-                <SelectItem value="debit">Cartão de Débito</SelectItem>
-                <SelectItem value="pix">PIX</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Button className="w-full" disabled={!selectedCustomer || items.length === 0}>
+          <div className="grid grid-cols-1 gap-4">
+            <Button
+              className="w-full"
+              disabled={!selectedCustomer || items.length === 0}
+              onClick={onSave}
+            >
               Finalizar Venda
             </Button>
           </div>
@@ -127,4 +114,4 @@ export const OrderSummary = ({
       </div>
     </Card>
   );
-};
+}

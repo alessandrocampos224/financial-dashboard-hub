@@ -7,23 +7,7 @@ import { Product } from "@/types/product";
 import { CustomerSelector } from "./components/CustomerSelector";
 import { ProductSearch } from "./components/ProductSearch";
 import { OrderSummary } from "./components/OrderSummary";
-
-// Mock de produtos para exemplo
-const mockProducts: Product[] = [
-  {
-    id: "1",
-    tenant_id: "1",
-    code: "PROD001",
-    name: "iPhone 15",
-    subtitle: "128GB Preto",
-    price: 5999.99,
-    status: true,
-    categories_id: "1",
-    brands_id: "1",
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-];
+import { supabase } from "@/integrations/supabase/client";
 
 export default function SalesForm() {
   const navigate = useNavigate();
@@ -34,11 +18,73 @@ export default function SalesForm() {
   const [items, setItems] = useState<Item[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  const filteredProducts = mockProducts.filter(
-    (product) =>
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.code.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleSave = async () => {
+    try {
+      if (!selectedCustomer) {
+        toast({
+          variant: "destructive",
+          title: "Erro",
+          description: "Selecione um cliente para continuar",
+        });
+        return;
+      }
+
+      if (items.length === 0) {
+        toast({
+          variant: "destructive",
+          title: "Erro",
+          description: "Adicione pelo menos um item ao pedido",
+        });
+        return;
+      }
+
+      const total = items.reduce((sum, item) => sum + (item.amount || 0), 0);
+
+      const { data: order, error: orderError } = await supabase
+        .from("orders")
+        .insert({
+          customer_id: selectedCustomer.id,
+          amount: total,
+          price: total,
+          status: true,
+        })
+        .select()
+        .single();
+
+      if (orderError) throw orderError;
+
+      const orderItems = items.map((item) => ({
+        order_id: order.id,
+        product_id: item.product_id,
+        quantity: item.quantity,
+        unitary: item.unitary,
+        amount: item.amount,
+        status: true,
+      }));
+
+      const { error: itemsError } = await supabase
+        .from("order_items")
+        .insert(orderItems);
+
+      if (itemsError) throw itemsError;
+
+      toast({
+        title: "Sucesso",
+        description: "Venda realizada com sucesso",
+      });
+
+      navigate("/financial/sales");
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Erro ao salvar venda",
+      });
+    }
+  };
+
+  const filteredProducts = []; // Implement product filtering logic here
 
   const addItem = (product: Product) => {
     const existingItem = items.find((item) => item.product_id === product.id);
@@ -142,6 +188,7 @@ export default function SalesForm() {
             removeItem={removeItem}
             total={total}
             selectedCustomer={selectedCustomer}
+            onSave={handleSave}
           />
         </div>
       </div>
