@@ -54,26 +54,40 @@ export default function CustomerForm() {
 
   const createMutation = useMutation({
     mutationFn: async (data: CustomerFormValues) => {
-      // Gerar um novo UUID para o cliente
-      const newId = crypto.randomUUID();
-      
-      // Primeiro, buscar o ID do perfil 'customer'
-      const { data: roleData, error: roleError } = await supabase
-        .from("roles")
-        .select("id")
-        .eq("alias", "customer")
-        .single();
+      try {
+        // Gerar um novo UUID para o cliente
+        const newId = crypto.randomUUID();
+        
+        // Primeiro, buscar o ID do perfil 'customer'
+        const { data: roleData, error: roleError } = await supabase
+          .from("roles")
+          .select("id")
+          .eq("alias", "customer")
+          .single();
 
-      if (roleError) throw roleError;
+        if (roleError) {
+          console.error("Erro ao buscar role:", roleError);
+          throw roleError;
+        }
 
-      const { error } = await supabase.from("profiles").insert({
-        id: newId,
-        ...data,
-        roles_id: roleData.id,
-        tenant_id: "1", // Você pode ajustar isso conforme necessário
-      });
+        const { error } = await supabase.from("profiles").insert({
+          id: newId,
+          ...data,
+          type: "customer",
+          roles_id: roleData.id,
+          tenant_id: "1", // Você pode ajustar isso conforme necessário
+        });
 
-      if (error) throw error;
+        if (error) {
+          console.error("Erro ao criar cliente:", error);
+          throw error;
+        }
+
+        return newId;
+      } catch (error) {
+        console.error("Erro completo:", error);
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["customers"] });
@@ -82,7 +96,7 @@ export default function CustomerForm() {
     },
     onError: (error) => {
       console.error("Erro ao criar cliente:", error);
-      toast.error("Erro ao criar cliente");
+      toast.error("Erro ao criar cliente. Por favor, verifique os dados e tente novamente.");
     },
   });
 
@@ -93,6 +107,7 @@ export default function CustomerForm() {
         .from("profiles")
         .update({
           ...data,
+          type: "customer",
         })
         .eq("id", id);
 
