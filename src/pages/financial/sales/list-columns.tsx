@@ -1,20 +1,20 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, CreditCard, Eye, Pencil } from "lucide-react";
+import { ArrowUpDown, Eye, CreditCard } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Order } from "@/types/order";
 
 export const columns: ColumnDef<Order>[] = [
   {
-    accessorKey: "id",
+    accessorKey: "invoice",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Número
+          Nota Fiscal
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -70,13 +70,6 @@ export const columns: ColumnDef<Order>[] = [
             onClick={() => navigate(`/financial/sales/${order.id}`)}
           >
             <Eye className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate(`/financial/sales/${order.id}/edit`)}
-          >
-            <Pencil className="h-4 w-4" />
           </Button>
           {status && (
             <Button
