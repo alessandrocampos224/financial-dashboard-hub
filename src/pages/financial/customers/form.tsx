@@ -103,25 +103,28 @@ export default function CustomerForm() {
           throw roleError;
         }
 
-        // 4. Atualizar o perfil do cliente
+        // 4. Criar o perfil do cliente
+        const profileData = {
+          id: authData.user.id,
+          name: data.name,
+          fantasia: data.fantasia,
+          document: data.document,
+          rg: data.rg,
+          ie: data.ie,
+          phone: data.phone,
+          email: data.email,
+          type: "customer",
+          roles_id: roleData.id,
+          tenant_id: user?.profile?.tenant_id || "1",
+          description: data.description,
+          status: data.status
+        };
+
         const { data: newCustomer, error } = await supabase
           .from("profiles")
-          .update({
-            name: data.name,
-            fantasia: data.fantasia,
-            document: data.document,
-            rg: data.rg,
-            ie: data.ie,
-            phone: data.phone,
-            email: data.email,
-            type: "customer",
-            roles_id: roleData.id,
-            tenant_id: user?.profile?.tenant_id || "1",
-            description: data.description,
-            status: data.status
-          })
-          .eq('id', authData.user.id)
-          .select();
+          .insert(profileData)
+          .select()
+          .single();
 
         if (error) {
           console.error("Erro ao criar cliente:", error);
