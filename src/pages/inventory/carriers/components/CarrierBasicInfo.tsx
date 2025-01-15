@@ -32,20 +32,6 @@ export function CarrierBasicInfo({ form }: CarrierBasicInfoProps) {
 
       <FormField
         control={form.control}
-        name="fantasia"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Nome Fantasia</FormLabel>
-            <FormControl>
-              <Input {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
         name="document"
         render={({ field }) => (
           <FormItem>
