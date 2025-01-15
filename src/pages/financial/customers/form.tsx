@@ -11,12 +11,14 @@ import { CustomerContact } from "./components/CustomerContact";
 import { customerFormSchema, type CustomerFormValues } from "./schema";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function CustomerForm() {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditing = !!id;
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const { data: customer, isLoading } = useQuery({
     queryKey: ["customer", id],
@@ -28,7 +30,10 @@ export default function CustomerForm() {
         .eq("id", id)
         .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Erro ao buscar cliente:", error);
+        throw error;
+      }
       return data;
     },
     enabled: !!id,
@@ -56,8 +61,8 @@ export default function CustomerForm() {
     mutationFn: async (data: CustomerFormValues) => {
       try {
         console.log("Iniciando criação do cliente...");
-        const newId = crypto.randomUUID();
         
+        // Buscar o ID do perfil 'customer'
         const { data: roleData, error: roleError } = await supabase
           .from("roles")
           .select("id")
@@ -71,27 +76,25 @@ export default function CustomerForm() {
 
         console.log("Role encontrada:", roleData);
 
-        const newCustomer = {
-          id: newId,
-          ...data,
-          type: "customer",
-          roles_id: roleData.id,
-          tenant_id: "1",
-        };
-
-        console.log("Dados a serem inseridos:", newCustomer);
-
-        const { error } = await supabase
+        // Criar o cliente com os dados corretos
+        const { data: newCustomer, error } = await supabase
           .from("profiles")
-          .insert(newCustomer);
+          .insert({
+            ...data,
+            type: "customer",
+            roles_id: roleData.id,
+            tenant_id: user?.profile?.tenant_id || "1", // Usar o tenant_id do usuário logado ou fallback para "1"
+          })
+          .select()
+          .single();
 
         if (error) {
           console.error("Erro ao criar cliente:", error);
           throw error;
         }
 
-        console.log("Cliente criado com sucesso!");
-        return newId;
+        console.log("Cliente criado com sucesso:", newCustomer);
+        return newCustomer;
       } catch (error) {
         console.error("Erro completo:", error);
         throw error;
@@ -116,6 +119,7 @@ export default function CustomerForm() {
         .update({
           ...data,
           type: "customer",
+          tenant_id: user?.profile?.tenant_id || "1",
         })
         .eq("id", id);
 
