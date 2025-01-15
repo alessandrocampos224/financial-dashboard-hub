@@ -61,12 +61,6 @@ export const CustomerSelector = ({
     fetchCustomers();
   }, [searchTerm]);
 
-  const filteredCustomers = customers.filter(
-    (customer) =>
-      customer.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customer.email?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   return (
     <Dialog open={isCustomerDialogOpen} onOpenChange={setIsCustomerDialogOpen}>
       <DialogTrigger asChild>
@@ -117,14 +111,14 @@ export const CustomerSelector = ({
                   Carregando...
                 </TableCell>
               </TableRow>
-            ) : filteredCustomers.length === 0 ? (
+            ) : customers.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={2} className="text-center">
                   Nenhum cliente encontrado
                 </TableCell>
               </TableRow>
             ) : (
-              filteredCustomers.map((customer) => (
+              customers.map((customer) => (
                 <TableRow
                   key={customer.id}
                   className="cursor-pointer hover:bg-muted/50"
