@@ -47,6 +47,7 @@ export const columns: ColumnDef<Customer>[] = [
       );
     },
   },
+
   {
     id: "actions",
     cell: ({ row }) => {
@@ -58,6 +59,23 @@ export const columns: ColumnDef<Customer>[] = [
         mutationFn: async () => {
           console.log("Iniciando processo de exclusão do cliente:", customer.id);
           
+          // Primeiro verificar se o perfil existe
+          const { data: existingProfile, error: checkError } = await supabase
+            .from("profiles")
+            .select()
+            .eq("id", customer.id)
+            .single();
+
+          if (checkError) {
+            console.error("Erro ao verificar perfil:", checkError);
+            throw new Error("Erro ao verificar existência do perfil");
+          }
+
+          if (!existingProfile) {
+            throw new Error("Perfil não encontrado");
+          }
+
+          // Tentar deletar o perfil
           const { data, error } = await supabase
             .from("profiles")
             .delete()
@@ -66,8 +84,8 @@ export const columns: ColumnDef<Customer>[] = [
             .single();
 
           if (error) {
-            console.error("Erro ao deletar perfil:", error);
-            throw error;
+            console.error("Erro detalhado ao deletar perfil:", error);
+            throw new Error(error.message);
           }
 
           console.log("Cliente excluído com sucesso:", data);
@@ -77,9 +95,9 @@ export const columns: ColumnDef<Customer>[] = [
           queryClient.invalidateQueries({ queryKey: ["customers"] });
           toast.success("Cliente excluído com sucesso!");
         },
-        onError: (error) => {
-          console.error("Erro completo ao excluir cliente:", error);
-          toast.error("Erro ao excluir cliente. Por favor, tente novamente.");
+        onError: (error: Error) => {
+          console.error("Erro ao excluir cliente:", error);
+          toast.error(`Erro ao excluir cliente: ${error.message}`);
         },
       });
 
