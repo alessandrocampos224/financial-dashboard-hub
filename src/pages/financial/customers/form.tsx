@@ -75,16 +75,18 @@ export default function CustomerForm() {
 
         console.log("Role encontrada:", roleData);
 
+        const newCustomerId = crypto.randomUUID();
+        
         // Criar o cliente com os dados corretos
         const { data: newCustomer, error } = await supabase
           .from("profiles")
-          .insert({
+          .insert([{
+            id: newCustomerId,
             ...data,
-            id: crypto.randomUUID(), // Gerando um UUID para o novo cliente
             type: "customer",
             roles_id: roleData.id,
             tenant_id: user?.profile?.tenant_id || "1",
-          })
+          }])
           .select()
           .single();
 
