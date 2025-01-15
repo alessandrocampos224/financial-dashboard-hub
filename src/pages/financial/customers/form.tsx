@@ -61,7 +61,18 @@ export default function CustomerForm() {
         console.log("Iniciando criação do cliente...");
         console.log("Dados do formulário:", data);
         
-        // 1. Primeiro criar o usuário no auth
+        // 1. Verificar se o usuário já existe
+        const { data: existingUser, error: checkError } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("email", data.email)
+          .maybeSingle();
+
+        if (existingUser) {
+          throw new Error("Um usuário com este email já existe.");
+        }
+
+        // 2. Criar o usuário no auth
         const { data: authData, error: authError } = await supabase.auth.signUp({
           email: data.email,
           password: data.password,
@@ -81,7 +92,7 @@ export default function CustomerForm() {
           throw new Error("Usuário não foi criado");
         }
 
-        // 2. Buscar o ID do perfil 'customer'
+        // 3. Buscar o ID do perfil 'customer'
         const { data: roleData, error: roleError } = await supabase
           .from("roles")
           .select("id")
@@ -93,11 +104,10 @@ export default function CustomerForm() {
           throw roleError;
         }
 
-        // 3. Criar o perfil do cliente
+        // 4. Atualizar o perfil do cliente
         const { data: newCustomer, error } = await supabase
           .from("profiles")
           .update({
-            id: authData.user.id,
             name: data.name,
             fantasia: data.fantasia,
             document: data.document,
@@ -131,9 +141,10 @@ export default function CustomerForm() {
       toast.success("Cliente criado com sucesso!");
       navigate("/financial/customers");
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error("Erro ao criar cliente:", error);
-      toast.error("Erro ao criar cliente. Por favor, verifique os dados e tente novamente.");
+      const errorMessage = error.message || "Erro ao criar cliente. Por favor, verifique os dados e tente novamente.";
+      toast.error(errorMessage);
     },
   });
 
