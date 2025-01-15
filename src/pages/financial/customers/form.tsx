@@ -72,8 +72,8 @@ export default function CustomerForm() {
 
             <div className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
               <Checkbox
-                checked={form.watch("status")}
-                onCheckedChange={(checked) => form.setValue("status", checked)}
+                checked={Boolean(form.watch("status"))}
+                onCheckedChange={(checked) => form.setValue("status", !!checked)}
               />
               <div className="space-y-1 leading-none">
                 <span>Ativo</span>
