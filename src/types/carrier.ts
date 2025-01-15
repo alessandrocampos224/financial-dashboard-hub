@@ -1,17 +1,16 @@
 export interface Carrier {
   id: string;
-  tenant_id: string;
+  tenant_id: string | null;
   name: string;
-  fantasia: string;
   document: string | null;
-  ie: string;
-  description: string;
+  ie: string | null;
   phone: string | null;
   email: string | null;
-  city: number | null;
   zip: string | null;
-  district: string | null;
   street: string | null;
+  number: string | null;
+  district: string | null;
+  city: string | null;
   state: string;
   status: boolean;
   created_at: string;
