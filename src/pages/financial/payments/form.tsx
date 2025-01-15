@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,26 +20,9 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomerSelector } from "@/pages/financial/sales/components/CustomerSelector";
-import { useState } from "react";
-
-// Mock de débitos do cliente
-const mockCustomerDebts = {
-  total: 1500.0,
-  items: [
-    {
-      id: "1",
-      description: "Venda #123",
-      amount: 1000.0,
-      date: "2024-01-10",
-    },
-    {
-      id: "2",
-      description: "Venda #124",
-      amount: 500.0,
-      date: "2024-01-12",
-    },
-  ],
-};
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 interface FormData {
   type: "entrada" | "saida";
@@ -50,9 +33,13 @@ interface FormData {
 
 export default function PaymentForm() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const orderId = searchParams.get('order_id');
+  const { user } = useAuth();
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
   const [isCustomerDialogOpen, setIsCustomerDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [orderDetails, setOrderDetails] = useState<any>(null);
 
   const form = useForm<FormData>({
     defaultValues: {
@@ -63,14 +50,108 @@ export default function PaymentForm() {
     },
   });
 
+  useEffect(() => {
+    if (orderId) {
+      fetchOrderDetails();
+    }
+  }, [orderId]);
+
+  const fetchOrderDetails = async () => {
+    try {
+      const { data: order, error } = await supabase
+        .from('orders')
+        .select(`
+          *,
+          customer:profiles(*)
+        `)
+        .eq('id', orderId)
+        .single();
+
+      if (error) throw error;
+
+      if (order) {
+        setOrderDetails(order);
+        setSelectedCustomer(order.customer);
+        form.setValue('amount', order.amount);
+        form.setValue('description', `Pagamento da venda #${order.id}`);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar detalhes do pedido:', error);
+      toast.error('Erro ao carregar detalhes do pedido');
+    }
+  };
+
   const onSubmit = async (data: FormData) => {
     try {
-      // Implementar lógica de salvamento
-      console.log("Dados do formulário:", data);
-      toast.success("Pagamento registrado com sucesso!");
-      navigate("/financial/payments");
+      if (!selectedCustomer) {
+        toast.error('Selecione um cliente');
+        return;
+      }
+
+      if (!user) {
+        toast.error('Você precisa estar logado para registrar um pagamento');
+        return;
+      }
+
+      // Primeiro, busca ou cria o caixa do dia
+      const { data: existingSafe, error: safeError } = await supabase
+        .from('safes')
+        .select('*')
+        .eq('status', true)
+        .gte('created_at', new Date().toISOString().split('T')[0])
+        .lte('created_at', new Date().toISOString().split('T')[0] + 'T23:59:59.999Z')
+        .single();
+
+      let safeId;
+
+      if (safeError) {
+        // Criar novo caixa para o dia
+        const { data: newSafe, error: createSafeError } = await supabase
+          .from('safes')
+          .insert({
+            description: `Caixa do dia ${new Date().toLocaleDateString()}`,
+            status: true,
+          })
+          .select()
+          .single();
+
+        if (createSafeError) throw createSafeError;
+        safeId = newSafe.id;
+      } else {
+        safeId = existingSafe.id;
+      }
+
+      // Registrar o pagamento
+      const { error: paymentError } = await supabase
+        .from('payments')
+        .insert({
+          safe_id: safeId,
+          user_id: user.id,
+          order_id: orderId,
+          amount: data.amount,
+          price: data.amount,
+          description: data.description,
+          number: new Date().getTime().toString(),
+          status: true,
+        });
+
+      if (paymentError) throw paymentError;
+
+      // Se veio de uma venda, atualizar o status da venda
+      if (orderId) {
+        const { error: orderError } = await supabase
+          .from('orders')
+          .update({ status: false })
+          .eq('id', orderId);
+
+        if (orderError) throw orderError;
+      }
+
+      toast.success('Pagamento registrado com sucesso!');
+      navigate('/financial/payments');
     } catch (error) {
-      toast.error("Erro ao registrar pagamento");
+      console.error('Erro ao registrar pagamento:', error);
+      toast.error('Erro ao registrar pagamento');
     }
   };
 
@@ -93,66 +174,20 @@ export default function PaymentForm() {
           />
         </div>
 
-        {selectedCustomer && mockCustomerDebts.total > 0 && (
+        {orderDetails && (
           <div className="bg-muted p-4 rounded-lg">
-            <h3 className="font-semibold mb-2">Débitos Pendentes</h3>
+            <h3 className="font-semibold mb-2">Detalhes da Venda</h3>
             <p className="text-lg mb-2">
-              Total: {mockCustomerDebts.total.toLocaleString("pt-BR", {
+              Total: {orderDetails.amount.toLocaleString("pt-BR", {
                 style: "currency",
                 currency: "BRL",
               })}
             </p>
-            <div className="space-y-2">
-              {mockCustomerDebts.items.map((debt) => (
-                <div
-                  key={debt.id}
-                  className="flex justify-between items-center bg-background p-2 rounded"
-                >
-                  <div>
-                    <p className="font-medium">{debt.description}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {new Date(debt.date).toLocaleDateString("pt-BR")}
-                    </p>
-                  </div>
-                  <p className="font-medium">
-                    {debt.amount.toLocaleString("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    })}
-                  </p>
-                </div>
-              ))}
-            </div>
           </div>
         )}
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="type"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tipo de Operação</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o tipo" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="entrada">Entrada</SelectItem>
-                      <SelectItem value="saida">Saída</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             <FormField
               control={form.control}
               name="amount"
