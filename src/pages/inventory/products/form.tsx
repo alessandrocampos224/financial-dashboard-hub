@@ -22,8 +22,8 @@ const formSchema = z.object({
   subtitle: z.string().optional(),
   category_id: z.string().optional(),
   brand_id: z.string().optional(),
-  price: z.number().min(0.01, "Preço deve ser maior que zero"),
-  stock: z.number().int().min(0, "Estoque não pode ser negativo").optional(),
+  price: z.coerce.number().min(0.01, "Preço deve ser maior que zero"),
+  stock: z.coerce.number().int().min(0, "Estoque não pode ser negativo").optional(),
   description: z.string().optional(),
   status: z.boolean().default(true),
 });
@@ -52,7 +52,17 @@ export default function ProductForm() {
 
   const onSubmit = async (values: FormValues) => {
     try {
-      await createProduct(values);
+      await createProduct({
+        code: values.code,
+        name: values.name,
+        price: values.price,
+        subtitle: values.subtitle,
+        category_id: values.category_id || undefined,
+        brand_id: values.brand_id || undefined,
+        stock: values.stock,
+        description: values.description,
+        status: values.status,
+      });
       navigate("/inventory/products");
     } catch (error) {
       console.error("Erro ao salvar produto:", error);
