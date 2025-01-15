@@ -61,7 +61,27 @@ export default function CustomerForm() {
         console.log("Iniciando criação do cliente...");
         console.log("Dados do formulário:", data);
         
-        // Buscar o ID do perfil 'customer'
+        // 1. Primeiro criar o usuário no auth
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email: data.email,
+          password: data.password,
+          options: {
+            data: {
+              name: data.name,
+            },
+          },
+        });
+
+        if (authError) {
+          console.error("Erro ao criar usuário:", authError);
+          throw authError;
+        }
+
+        if (!authData.user) {
+          throw new Error("Usuário não foi criado");
+        }
+
+        // 2. Buscar o ID do perfil 'customer'
         const { data: roleData, error: roleError } = await supabase
           .from("roles")
           .select("id")
@@ -73,20 +93,25 @@ export default function CustomerForm() {
           throw roleError;
         }
 
-        console.log("Role encontrada:", roleData);
-
-        const newCustomerId = crypto.randomUUID();
-        
-        // Criar o cliente com os dados corretos
+        // 3. Criar o perfil do cliente
         const { data: newCustomer, error } = await supabase
           .from("profiles")
-          .insert([{
-            id: newCustomerId,
-            ...data,
+          .update([{
+            id: authData.user.id,
+            name: data.name,
+            fantasia: data.fantasia,
+            document: data.document,
+            rg: data.rg,
+            ie: data.ie,
+            phone: data.phone,
+            email: data.email,
             type: "customer",
             roles_id: roleData.id,
             tenant_id: user?.profile?.tenant_id || "1",
+            description: data.description,
+            status: data.status
           }])
+          .eq('id', authData.user.id)
           .select();
 
         if (error) {
@@ -118,8 +143,16 @@ export default function CustomerForm() {
       const { error } = await supabase
         .from("profiles")
         .update({
-          ...data,
+          name: data.name,
+          fantasia: data.fantasia,
+          document: data.document,
+          rg: data.rg,
+          ie: data.ie,
+          phone: data.phone,
+          email: data.email,
           type: "customer",
+          description: data.description,
+          status: data.status,
           tenant_id: user?.profile?.tenant_id || "1",
         })
         .eq("id", id);
