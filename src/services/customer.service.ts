@@ -4,28 +4,42 @@ import { toast } from "sonner";
 
 export const customerService = {
   async checkExistingUser(email: string) {
-    const { data } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('email', email)
-      .single();
-    
-    return !!data;
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, email')
+        .eq('email', email)
+        .single();
+
+      if (error) {
+        console.error('Erro ao verificar usuário existente:', error);
+      }
+      
+      return !!data;
+    } catch (error) {
+      console.error('Erro ao verificar usuário:', error);
+      return false;
+    }
   },
 
   async getRoleIdByAlias(alias: string) {
-    const { data, error } = await supabase
-      .from('roles')
-      .select('id')
-      .eq('alias', alias)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('roles')
+        .select('id')
+        .eq('alias', alias)
+        .single();
 
-    if (error) {
+      if (error) {
+        console.error('Erro ao buscar role:', error);
+        throw new Error('Erro ao buscar role');
+      }
+
+      return data?.id;
+    } catch (error) {
       console.error('Erro ao buscar role:', error);
-      throw new Error('Erro ao buscar role');
+      throw error;
     }
-
-    return data?.id;
   },
 
   async createCustomer(data: CustomerFormValues, roleId: string, tenantId: string) {
@@ -70,6 +84,8 @@ export const customerService = {
         status: data.status,
       };
 
+      console.log('Dados do perfil a serem inseridos:', profileData);
+
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .insert(profileData)
@@ -79,10 +95,14 @@ export const customerService = {
       if (profileError) {
         console.error('Erro ao criar perfil:', profileError);
         // Tentar remover o usuário auth se falhar ao criar o perfil
-        await supabase.auth.admin.deleteUser(authData.user.id);
+        const { error: deleteError } = await supabase.auth.admin.deleteUser(authData.user.id);
+        if (deleteError) {
+          console.error('Erro ao deletar usuário após falha na criação do perfil:', deleteError);
+        }
         throw profileError;
       }
 
+      console.log('Perfil criado com sucesso:', profile);
       return profile;
     } catch (error) {
       console.error('Erro completo:', error);

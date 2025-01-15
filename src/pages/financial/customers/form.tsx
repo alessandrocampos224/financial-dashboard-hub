@@ -32,6 +32,8 @@ export default function CustomerFormPage() {
   const createMutation = useMutation({
     mutationFn: async (data: CustomerFormValues) => {
       try {
+        console.log('Iniciando processo de criação do cliente...');
+        
         // 1. Verificar se o usuário já existe
         const userExists = await customerService.checkExistingUser(data.email);
         if (userExists) {
@@ -43,6 +45,8 @@ export default function CustomerFormPage() {
         if (!roleId) {
           throw new Error("Perfil 'customer' não encontrado.");
         }
+        
+        console.log('Role ID encontrado:', roleId);
         
         // 3. Criar o cliente
         const customer = await customerService.createCustomer(
