@@ -1,1 +1,10 @@
 project_id = "srapqeeddrxzpocvheap"
+
+[functions.delete-product]
+verify_jwt = true
+
+[functions.delete-brand]
+verify_jwt = true
+
+[functions.delete-carrier]
+verify_jwt = true
