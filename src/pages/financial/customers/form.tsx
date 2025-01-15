@@ -76,15 +76,14 @@ export default function CustomerForm() {
 
         console.log("Role encontrada:", roleData);
 
-        // Criar o cliente com os dados corretos
+        // Criar o cliente com os dados corretos e gerar UUID automaticamente
         const { data: newCustomer, error } = await supabase
           .from("profiles")
-          .insert({
+          .insert([{
             ...data,
-            type: "customer",
             roles_id: roleData.id,
-            tenant_id: user?.profile?.tenant_id || "1", // Usar o tenant_id do usuário logado ou fallback para "1"
-          })
+            tenant_id: user?.profile?.tenant_id || "1",
+          }])
           .select()
           .single();
 
@@ -118,7 +117,6 @@ export default function CustomerForm() {
         .from("profiles")
         .update({
           ...data,
-          type: "customer",
           tenant_id: user?.profile?.tenant_id || "1",
         })
         .eq("id", id);
