@@ -12,12 +12,18 @@ import { InventoryRoutes } from "./routes/inventory.routes";
 import { FinancialRoutes } from "./routes/financial.routes";
 import { SettingsRoutes } from "./routes/settings.routes";
 import { OperationalRoutes } from "./routes/operational.routes";
+import { useAuth } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient();
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
-  const isAuthenticated = localStorage.getItem("user") !== null;
-  return isAuthenticated ? children : <Navigate to="/login" />;
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return <div>Carregando...</div>;
+  }
+  
+  return user ? children : <Navigate to="/login" />;
 }
 
 const App = () => {

@@ -1,53 +1,44 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { authService } from '../services/auth.service';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { User } from '@supabase/supabase-js';
 
 interface AuthContextType {
-  user: any | null;
+  user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<any | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    checkAuth();
+    checkUser();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  async function checkAuth() {
+  async function checkUser() {
     try {
-      if (localStorage.getItem('token')) {
-        const userData = await authService.getUser();
-        setUser(userData);
-      }
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
     } catch (error) {
-      console.error('Erro ao verificar autenticação:', error);
+      console.error('Erro ao verificar usuário:', error);
     } finally {
       setLoading(false);
     }
   }
 
-  async function login(email: string, password: string) {
-    try {
-      const response = await authService.login(email, password);
-      setUser(response.user);
-      toast.success('Login realizado com sucesso!');
-    } catch (error) {
-      console.error('Erro no login:', error);
-      toast.error('Erro ao realizar login. Verifique suas credenciais.');
-      throw error;
-    }
-  }
-
   async function logout() {
     try {
-      await authService.logout();
-      setUser(null);
+      await supabase.auth.signOut();
       toast.success('Logout realizado com sucesso!');
     } catch (error) {
       console.error('Erro no logout:', error);
@@ -56,7 +47,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, logout }}>
       {children}
     </AuthContext.Provider>
   );
