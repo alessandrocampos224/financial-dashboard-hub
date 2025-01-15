@@ -46,7 +46,7 @@ export default function SalesPage() {
       }
 
       console.log("Produtos encontrados:", data);
-      return data || [];
+      return data as Product[];  // Adicionado type assertion aqui
     },
   });
 
