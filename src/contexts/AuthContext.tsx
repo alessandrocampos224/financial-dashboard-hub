@@ -81,28 +81,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   async function logout() {
     try {
+      // Primeiro, limpar o estado local e localStorage
+      setUser(null);
+      localStorage.clear();
+      
+      // Tentar fazer signOut no Supabase
       const { error } = await supabase.auth.signOut();
       
       if (error) {
         console.error('Erro durante signOut:', error);
-        // Se houver erro no signOut, vamos forçar a limpeza do estado
-        setUser(null);
-        // Forçar limpeza do localStorage
-        localStorage.clear();
+        // Mesmo com erro no signOut, já limpamos o estado local
         throw error;
       }
 
-      // Logout bem sucedido
-      setUser(null);
       toast.success('Logout realizado com sucesso!');
       
       // Redirecionar para a página de login
       window.location.href = '/login';
     } catch (error) {
       console.error('Erro no logout:', error);
-      // Mesmo com erro, vamos garantir que o usuário seja deslogado localmente
-      setUser(null);
-      localStorage.clear();
+      // Mesmo com erro, já garantimos que o usuário está deslogado localmente
+      // Forçar redirecionamento para login
+      window.location.href = '/login';
       throw error;
     }
   }
