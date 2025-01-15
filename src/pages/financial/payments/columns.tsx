@@ -25,6 +25,10 @@ export const columns: ColumnDef<Payment>[] = [
     header: "Cliente",
   },
   {
+    accessorKey: "order.invoice",
+    header: "Nota Fiscal",
+  },
+  {
     accessorKey: "description",
     header: "Descrição",
   },
