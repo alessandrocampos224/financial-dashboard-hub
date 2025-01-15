@@ -27,24 +27,24 @@
   }
  
   .dark {
-    --background: 220 20% 12%;
-    --foreground: 210 40% 98%;
-    --card: 220 20% 12%;
-    --card-foreground: 210 40% 98%;
-    --popover: 220 20% 12%;
-    --popover-foreground: 210 40% 98%;
+    --background: 0 0% 12%;
+    --foreground: 0 0% 89%;
+    --card: 0 0% 12%;
+    --card-foreground: 0 0% 89%;
+    --popover: 0 0% 12%;
+    --popover-foreground: 0 0% 89%;
     --primary: 217.2 91.2% 59.8%;
     --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 220 18% 18%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 220 18% 18%;
-    --muted-foreground: 210 40% 90%;
-    --accent: 220 18% 18%;
-    --accent-foreground: 210 40% 98%;
+    --secondary: 0 0% 18%;
+    --secondary-foreground: 0 0% 89%;
+    --muted: 0 0% 18%;
+    --muted-foreground: 0 0% 89%;
+    --accent: 0 0% 18%;
+    --accent-foreground: 0 0% 89%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 220 18% 20%;
-    --input: 220 18% 18%;
+    --destructive-foreground: 0 0% 89%;
+    --border: 0 0% 25%;
+    --input: 0 0% 18%;
     --ring: 224.3 76.3% 48%;
   }
 }
@@ -78,40 +78,40 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-gdrive-background text-gdrive-text dark:bg-gdrive-background dark:text-gdrive-text;
   }
 }
 
 @layer components {
   .table-header {
-    @apply bg-background border-b border-border dark:bg-secondary/50;
+    @apply bg-background border-b border-border;
   }
   
   .table-row {
-    @apply hover:bg-muted/50 dark:hover:bg-secondary/80 transition-colors border-b border-border dark:border-border/50;
+    @apply transition-colors border-b border-border;
   }
   
   .table-cell {
-    @apply p-4 align-middle [&:has([role=checkbox])]:pr-0 dark:text-foreground/90;
+    @apply p-4 align-middle [&:has([role=checkbox])]:pr-0;
+  }
+
+  .dark .table-header {
+    @apply bg-gdrive-surface border-gdrive-border;
   }
 
   .dark .table-header th {
-    @apply text-foreground/70 bg-secondary/50;
+    @apply text-gdrive-text bg-gdrive-surface;
   }
 
   .dark .table-row {
-    @apply border-border/50 hover:bg-secondary/80;
+    @apply border-gdrive-border hover:bg-gdrive-hover;
   }
 
   .dark .table-cell {
-    @apply text-foreground/90;
+    @apply text-gdrive-text;
   }
 
   .dark .table-row td {
-    @apply border-border/50;
-  }
-
-  .dark .table-row:hover {
-    @apply bg-secondary/80;
+    @apply border-gdrive-border;
   }
 }
