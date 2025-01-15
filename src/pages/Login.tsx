@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
@@ -10,11 +10,18 @@ export default function Login() {
   const navigate = useNavigate();
   const [error, setError] = useState("");
 
-  supabase.auth.onAuthStateChange((event, session) => {
-    if (event === "SIGNED_IN" && session) {
-      navigate("/");
-    }
-  });
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        navigate("/");
+      }
+      if (event === 'USER_UPDATED' || event === 'SIGNED_OUT') {
+        setError("");
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
@@ -53,9 +60,6 @@ export default function Login() {
             }}
             providers={[]}
             redirectTo={window.location.origin}
-            onError={(error) => {
-              setError(error.message);
-            }}
             localization={{
               variables: {
                 sign_in: {
