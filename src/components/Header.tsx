@@ -1,4 +1,4 @@
-import { Bell, Moon, Sun } from "lucide-react";
+import { Bell, Menu, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "next-themes";
@@ -18,10 +18,22 @@ export function Header() {
 
   return (
     <header className="h-16 border-b border-border bg-background/80 backdrop-blur-lg sticky top-0 z-50">
-      <div className="h-full flex items-center justify-between px-6">
-        <h2 className="text-xl font-semibold text-foreground">IDEAL COMUNICAÇÃO VISUAL LTDA ME</h2>
-        
+      <div className="h-full flex items-center justify-between px-4 md:px-6">
         <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden text-foreground"
+            onClick={() => document.querySelector('aside')?.classList.toggle('-translate-x-full')}
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+          <h2 className="text-lg md:text-xl font-semibold text-foreground truncate">
+            IDEAL COMUNICAÇÃO VISUAL LTDA ME
+          </h2>
+        </div>
+        
+        <div className="flex items-center gap-2 md:gap-4">
           <Button
             variant="ghost"
             size="icon"
@@ -39,8 +51,8 @@ export function Header() {
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                <Avatar>
+              <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                <Avatar className="h-8 w-8">
                   <AvatarImage src={user?.profile?.avatar_url || ''} alt={user?.profile?.name || ''} />
                   <AvatarFallback>{user?.profile?.name?.charAt(0) || 'U'}</AvatarFallback>
                 </Avatar>

@@ -17,6 +17,7 @@ export function AppSidebar() {
     <aside
       className={cn(
         "h-screen sticky top-0 flex flex-col bg-background border-r border-border transition-all duration-300",
+        "fixed md:relative -translate-x-full md:translate-x-0 z-50",
         collapsed ? "w-20" : "w-64"
       )}
     >

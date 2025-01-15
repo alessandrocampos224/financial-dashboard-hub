@@ -35,7 +35,7 @@ const invoicesData = [
 
 export function Dashboard() {
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 p-4 md:p-6">
+    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
       <Card className="dark:bg-gdrive-surface">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Vendas Totais</CardTitle>
@@ -48,6 +48,7 @@ export function Dashboard() {
           </p>
         </CardContent>
       </Card>
+      
       <Card className="dark:bg-gdrive-surface">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Pedidos</CardTitle>
@@ -60,6 +61,7 @@ export function Dashboard() {
           </p>
         </CardContent>
       </Card>
+      
       <Card className="dark:bg-gdrive-surface">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Notas Fiscais</CardTitle>
@@ -72,6 +74,7 @@ export function Dashboard() {
           </p>
         </CardContent>
       </Card>
+      
       <Card className="dark:bg-gdrive-surface">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Taxa de Conversão</CardTitle>
@@ -84,79 +87,85 @@ export function Dashboard() {
           </p>
         </CardContent>
       </Card>
-      <Card className="col-span-2 dark:bg-gdrive-surface">
+      
+      <Card className="col-span-1 sm:col-span-2 dark:bg-gdrive-surface">
         <CardHeader>
           <CardTitle>Vendas Mensais</CardTitle>
         </CardHeader>
         <CardContent>
           <ChartContainer className="h-[240px]" config={{}}>
-            <AreaChart data={salesData}>
-              <XAxis dataKey="month" stroke="#888888" fontSize={12} />
-              <YAxis stroke="#888888" fontSize={12} tickFormatter={(value) => `R$${value}`} />
-              <Area
-                type="monotone"
-                dataKey="total"
-                stroke="#8884d8"
-                fill="#8884d8"
-                fillOpacity={0.2}
-              />
-              <Tooltip content={({ active, payload }) => {
-                if (active && payload && payload.length) {
-                  return (
-                    <div className="rounded-lg border bg-background p-2 shadow-sm">
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="flex flex-col">
-                          <span className="text-[0.70rem] uppercase text-muted-foreground">
-                            Total
-                          </span>
-                          <span className="font-bold text-muted-foreground">
-                            R${payload[0].value}
-                          </span>
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={salesData}>
+                <XAxis dataKey="month" stroke="#888888" fontSize={12} />
+                <YAxis stroke="#888888" fontSize={12} tickFormatter={(value) => `R$${value}`} />
+                <Area
+                  type="monotone"
+                  dataKey="total"
+                  stroke="#8884d8"
+                  fill="#8884d8"
+                  fillOpacity={0.2}
+                />
+                <Tooltip content={({ active, payload }) => {
+                  if (active && payload && payload.length) {
+                    return (
+                      <div className="rounded-lg border bg-background p-2 shadow-sm">
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="flex flex-col">
+                            <span className="text-[0.70rem] uppercase text-muted-foreground">
+                              Total
+                            </span>
+                            <span className="font-bold text-muted-foreground">
+                              R${payload[0].value}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )
-                }
-                return null
-              }} />
-            </AreaChart>
+                    )
+                  }
+                  return null
+                }} />
+              </AreaChart>
+            </ResponsiveContainer>
           </ChartContainer>
         </CardContent>
       </Card>
-      <Card className="col-span-2 dark:bg-gdrive-surface">
+      
+      <Card className="col-span-1 sm:col-span-2 dark:bg-gdrive-surface">
         <CardHeader>
           <CardTitle>Notas Fiscais Emitidas (Última Semana)</CardTitle>
         </CardHeader>
         <CardContent>
           <ChartContainer className="h-[240px]" config={{}}>
-            <BarChart data={invoicesData}>
-              <XAxis dataKey="name" stroke="#888888" fontSize={12} />
-              <YAxis stroke="#888888" fontSize={12} />
-              <Bar
-                dataKey="total"
-                fill="#2563eb"
-                radius={[4, 4, 0, 0]}
-              />
-              <Tooltip content={({ active, payload }) => {
-                if (active && payload && payload.length) {
-                  return (
-                    <div className="rounded-lg border bg-background p-2 shadow-sm">
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="flex flex-col">
-                          <span className="text-[0.70rem] uppercase text-muted-foreground">
-                            Total
-                          </span>
-                          <span className="font-bold text-muted-foreground">
-                            {payload[0].value}
-                          </span>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={invoicesData}>
+                <XAxis dataKey="name" stroke="#888888" fontSize={12} />
+                <YAxis stroke="#888888" fontSize={12} />
+                <Bar
+                  dataKey="total"
+                  fill="#2563eb"
+                  radius={[4, 4, 0, 0]}
+                />
+                <Tooltip content={({ active, payload }) => {
+                  if (active && payload && payload.length) {
+                    return (
+                      <div className="rounded-lg border bg-background p-2 shadow-sm">
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="flex flex-col">
+                            <span className="text-[0.70rem] uppercase text-muted-foreground">
+                              Total
+                            </span>
+                            <span className="font-bold text-muted-foreground">
+                              {payload[0].value}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )
-                }
-                return null
-              }} />
-            </BarChart>
+                    )
+                  }
+                  return null
+                }} />
+              </BarChart>
+            </ResponsiveContainer>
           </ChartContainer>
         </CardContent>
       </Card>
