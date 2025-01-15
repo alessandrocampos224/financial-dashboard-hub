@@ -56,12 +56,19 @@ export const columns: ColumnDef<Customer>[] = [
 
       const deleteMutation = useMutation({
         mutationFn: async () => {
-          const { error } = await supabase
-            .from("profiles")
-            .delete()
-            .eq("id", customer.id);
+          // Primeiro, tentar deletar o usuário do auth
+          const { error: authError } = await supabase.auth.admin.deleteUser(
+            customer.id
+          );
 
-          if (error) throw error;
+          if (authError) {
+            console.error("Erro ao deletar usuário do auth:", authError);
+            throw authError;
+          }
+
+          // O trigger on delete cascade deve deletar o perfil automaticamente
+          // devido à foreign key constraint
+          return { success: true };
         },
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ["customers"] });

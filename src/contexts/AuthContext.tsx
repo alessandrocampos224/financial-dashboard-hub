@@ -56,29 +56,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    // Verificar sessão inicial
+    // Verificar sessão inicial e configurar listener
     supabase.auth.getSession().then(({ data: { session } }) => {
       console.log('Sessão inicial:', session);
       updateUserWithProfile(session);
-    });
 
-    // Configurar listener para mudanças de autenticação
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Mudança de estado de autenticação:', event, session);
-      
-      if (event === 'SIGNED_IN') {
-        await updateUserWithProfile(session);
-      } else if (event === 'SIGNED_OUT') {
-        setUser(null);
-        setLoading(false);
-      } else if (event === 'TOKEN_REFRESHED') {
-        await updateUserWithProfile(session);
-      }
-    });
+      // Configurar listener para mudanças de autenticação
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+        console.log('Mudança de estado de autenticação:', event, session);
+        
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          await updateUserWithProfile(session);
+        } else if (event === 'SIGNED_OUT') {
+          setUser(null);
+          setLoading(false);
+        }
+      });
 
-    return () => {
-      subscription.unsubscribe();
-    };
+      return () => {
+        subscription.unsubscribe();
+      };
+    });
   }, []);
 
   async function logout() {
