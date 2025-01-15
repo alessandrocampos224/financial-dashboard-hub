@@ -9,7 +9,6 @@ export const customerFormSchema = z.object({
   phone: z.string().optional(),
   email: z.string().email("Email inválido"),
   password: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
-  roles_id: z.string().min(1, "Perfil é obrigatório"),
   description: z.string().optional(),
   status: z.boolean().default(true),
 });

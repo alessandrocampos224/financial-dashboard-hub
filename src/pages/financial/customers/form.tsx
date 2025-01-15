@@ -50,7 +50,6 @@ export default function CustomerForm() {
       phone: customer?.phone || "",
       email: customer?.email || "",
       password: "",
-      roles_id: customer?.roles_id || "",
       description: customer?.description || "",
       status: customer?.status ?? true,
     },
@@ -60,6 +59,7 @@ export default function CustomerForm() {
     mutationFn: async (data: CustomerFormValues) => {
       try {
         console.log("Iniciando criação do cliente...");
+        console.log("Dados do formulário:", data);
         
         // Buscar o ID do perfil 'customer'
         const { data: roleData, error: roleError } = await supabase
@@ -87,8 +87,7 @@ export default function CustomerForm() {
             roles_id: roleData.id,
             tenant_id: user?.profile?.tenant_id || "1",
           }])
-          .select()
-          .single();
+          .select();
 
         if (error) {
           console.error("Erro ao criar cliente:", error);
