@@ -17,6 +17,35 @@ export default function SalesForm() {
   const [isCustomerDialogOpen, setIsCustomerDialogOpen] = useState(false);
   const [items, setItems] = useState<Item[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+
+  // Função para buscar produtos baseado no termo de busca
+  const searchProducts = async (term: string) => {
+    if (!term) {
+      setFilteredProducts([]);
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .or(`name.ilike.%${term}%,code.ilike.%${term}%`)
+      .eq('status', true)
+      .limit(5);
+
+    if (error) {
+      console.error("Erro ao buscar produtos:", error);
+      return;
+    }
+
+    setFilteredProducts(data || []);
+  };
+
+  // Atualiza a busca quando o termo muda
+  const handleSearchChange = (term: string) => {
+    setSearchTerm(term);
+    searchProducts(term);
+  };
 
   const handleSave = async () => {
     try {
@@ -83,8 +112,6 @@ export default function SalesForm() {
       });
     }
   };
-
-  const filteredProducts = []; // Implement product filtering logic here
 
   const addItem = (product: Product) => {
     const existingItem = items.find((item) => item.product_id === product.id);
@@ -177,7 +204,7 @@ export default function SalesForm() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <ProductSearch
             searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
+            setSearchTerm={handleSearchChange}
             filteredProducts={filteredProducts}
             onProductSelect={addItem}
           />
