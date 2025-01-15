@@ -125,15 +125,13 @@ export default function PaymentForm() {
 
       if (paymentError) throw paymentError;
 
-      // Se veio de uma venda, atualizar o status da venda
-      if (orderId) {
-        const { error: orderError } = await supabase
-          .from('orders')
-          .update({ status: false })
-          .eq('id', orderId);
+      // Atualizar o status da venda
+      const { error: orderError } = await supabase
+        .from('orders')
+        .update({ status: false })
+        .eq('id', orderId);
 
-        if (orderError) throw orderError;
-      }
+      if (orderError) throw orderError;
 
       toast.success('Pagamento registrado com sucesso!');
       navigate('/financial/sales');
