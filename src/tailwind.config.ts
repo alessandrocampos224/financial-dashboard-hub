@@ -64,6 +64,13 @@ export default {
           800: "#145b50",
           900: "#134a43",
         },
+        gdrive: {
+          background: "#1F1F1F",
+          surface: "#2F2F2F",
+          hover: "#3C3C3C",
+          border: "#404040",
+          text: "#E3E3E3",
+        }
       },
       borderRadius: {
         lg: "var(--radius)",

@@ -35,16 +35,16 @@
     --popover-foreground: 210 40% 98%;
     --primary: 217.2 91.2% 59.8%;
     --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 220 20% 16%;
+    --secondary: 220 18% 18%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 220 20% 16%;
+    --muted: 220 18% 18%;
     --muted-foreground: 210 40% 90%;
-    --accent: 220 20% 16%;
+    --accent: 220 18% 18%;
     --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 220 20% 20%;
-    --input: 220 20% 16%;
+    --border: 220 18% 20%;
+    --input: 220 18% 18%;
     --ring: 224.3 76.3% 48%;
   }
 }
@@ -96,15 +96,11 @@
   }
 
   .dark .table-header th {
-    @apply text-foreground/90 bg-secondary/50;
+    @apply text-foreground/70 bg-secondary/50;
   }
 
   .dark .table-row {
-    @apply border-border/50;
-  }
-
-  .dark .table-row:hover {
-    @apply bg-secondary/80;
+    @apply border-border/50 hover:bg-secondary/80;
   }
 
   .dark .table-cell {
@@ -113,5 +109,9 @@
 
   .dark .table-row td {
     @apply border-border/50;
+  }
+
+  .dark .table-row:hover {
+    @apply bg-secondary/80;
   }
 }
