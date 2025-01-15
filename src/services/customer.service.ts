@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { CustomerFormValues } from "@/pages/financial/customers/schema";
+import { AuthError } from "@supabase/supabase-js";
 
 export const customerService = {
   async checkExistingUser(email: string) {
@@ -54,13 +55,7 @@ export const customerService = {
       console.log('Iniciando criação do cliente...');
       console.log('Dados do formulário:', data);
 
-      // 1. Verificar se o usuário já existe
-      const userExists = await this.checkExistingUser(data.email);
-      if (userExists) {
-        throw new Error('Um usuário com este email já existe no sistema.');
-      }
-
-      // 2. Criar o usuário no auth
+      // 1. Criar o usuário no auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
@@ -73,6 +68,10 @@ export const customerService = {
 
       if (authError) {
         console.error('Erro ao criar usuário:', authError);
+        // Verificar se o erro é de usuário já existente
+        if (authError.message.includes('User already registered')) {
+          throw new Error('Um usuário com este email já está registrado no sistema.');
+        }
         throw authError;
       }
 
@@ -80,10 +79,10 @@ export const customerService = {
         throw new Error('Usuário não foi criado');
       }
 
-      // 3. Aguardar um momento para garantir que o trigger criou o perfil
+      // 2. Aguardar um momento para garantir que o trigger criou o perfil
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // 4. Atualizar o perfil do cliente com informações adicionais
+      // 3. Atualizar o perfil do cliente com informações adicionais
       const profileData = {
         name: data.name,
         fantasia: data.fantasia,
@@ -116,6 +115,12 @@ export const customerService = {
       return profile;
     } catch (error) {
       console.error('Erro completo:', error);
+      if (error instanceof AuthError) {
+        // Tratar erros específicos do Auth
+        if (error.message.includes('User already registered')) {
+          throw new Error('Um usuário com este email já está registrado no sistema.');
+        }
+      }
       throw error;
     }
   }
