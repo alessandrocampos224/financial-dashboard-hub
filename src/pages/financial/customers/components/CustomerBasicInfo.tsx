@@ -23,20 +23,6 @@ export function CustomerBasicInfo({ form }: CustomerBasicInfoProps) {
           </FormItem>
         )}
       />
-
-      <FormField
-        control={form.control}
-        name="fantasia"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Nome Fantasia</FormLabel>
-            <FormControl>
-              <Input {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
     </>
   );
 }

@@ -12,20 +12,6 @@ export function CustomerContact({ form }: CustomerContactProps) {
     <>
       <FormField
         control={form.control}
-        name="phone"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Telefone</FormLabel>
-            <FormControl>
-              <Input {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
         name="email"
         render={({ field }) => (
           <FormItem>
