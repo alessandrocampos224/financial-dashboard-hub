@@ -1,9 +1,11 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, Eye, CreditCard } from "lucide-react";
+import { ArrowUpDown, Eye, CreditCard, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Order } from "@/types/order";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export const columns: ColumnDef<Order>[] = [
   {
@@ -61,6 +63,27 @@ export const columns: ColumnDef<Order>[] = [
       const navigate = useNavigate();
       const order = row.original;
       const status = row.getValue("status") as boolean;
+      const createdAt = new Date(order.created_at);
+      const today = new Date();
+      const isToday = createdAt.toDateString() === today.toDateString();
+
+      const handleDelete = async () => {
+        try {
+          const { error } = await supabase
+            .from("orders")
+            .delete()
+            .eq("id", order.id);
+
+          if (error) throw error;
+
+          toast.success("Venda excluída com sucesso!");
+          // Recarregar a página para atualizar a lista
+          window.location.reload();
+        } catch (error) {
+          console.error("Erro ao excluir venda:", error);
+          toast.error("Erro ao excluir venda. Tente novamente.");
+        }
+      };
 
       return (
         <div className="flex gap-2">
@@ -78,6 +101,16 @@ export const columns: ColumnDef<Order>[] = [
               onClick={() => navigate(`/financial/payments/new?order_id=${order.id}`)}
             >
               <CreditCard className="h-4 w-4" />
+            </Button>
+          )}
+          {isToday && status && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleDelete}
+              className="text-red-500 hover:text-red-700"
+            >
+              <Trash2 className="h-4 w-4" />
             </Button>
           )}
         </div>
