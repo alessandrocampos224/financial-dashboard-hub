@@ -4,11 +4,12 @@ import { CustomerFormValues } from "@/pages/financial/customers/schema";
 export const customerService = {
   async checkExistingUser(email: string) {
     try {
+      // Usar maybeSingle() em vez de single() para evitar erro 406
       const { data, error } = await supabase
         .from('profiles')
         .select('id, email')
         .eq('email', email)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Erro ao verificar usuário existente:', error);
@@ -27,7 +28,7 @@ export const customerService = {
         .from('roles')
         .select('id')
         .eq('alias', alias)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Erro ao buscar role:', error);
@@ -46,7 +47,13 @@ export const customerService = {
       console.log('Iniciando criação do cliente...');
       console.log('Dados do formulário:', data);
 
-      // 1. Criar o usuário no auth
+      // 1. Verificar se o usuário já existe antes de tentar criar
+      const userExists = await this.checkExistingUser(data.email);
+      if (userExists) {
+        throw new Error('Um usuário com este email já existe no sistema.');
+      }
+
+      // 2. Criar o usuário no auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
@@ -66,10 +73,10 @@ export const customerService = {
         throw new Error('Usuário não foi criado');
       }
 
-      // 2. Aguardar um momento para garantir que o trigger criou o perfil
+      // 3. Aguardar um momento para garantir que o trigger criou o perfil
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // 3. Atualizar o perfil do cliente com informações adicionais
+      // 4. Atualizar o perfil do cliente com informações adicionais
       const profileData = {
         name: data.name,
         fantasia: data.fantasia,
