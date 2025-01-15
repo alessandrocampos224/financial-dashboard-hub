@@ -96,7 +96,7 @@ export default function CustomerForm() {
         // 3. Criar o perfil do cliente
         const { data: newCustomer, error } = await supabase
           .from("profiles")
-          .update([{
+          .update({
             id: authData.user.id,
             name: data.name,
             fantasia: data.fantasia,
@@ -110,7 +110,7 @@ export default function CustomerForm() {
             tenant_id: user?.profile?.tenant_id || "1",
             description: data.description,
             status: data.status
-          }])
+          })
           .eq('id', authData.user.id)
           .select();
 
