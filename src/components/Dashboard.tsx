@@ -10,6 +10,7 @@ import {
   Bar, 
   BarChart,
   ResponsiveContainer, 
+  Tooltip,
   XAxis, 
   YAxis 
 } from "recharts";
@@ -99,9 +100,25 @@ export function Dashboard() {
                 fill="#8884d8"
                 fillOpacity={0.2}
               />
-              <ChartTooltip>
-                <ChartTooltipContent />
-              </ChartTooltip>
+              <Tooltip content={({ active, payload }) => {
+                if (active && payload && payload.length) {
+                  return (
+                    <div className="rounded-lg border bg-background p-2 shadow-sm">
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="flex flex-col">
+                          <span className="text-[0.70rem] uppercase text-muted-foreground">
+                            Total
+                          </span>
+                          <span className="font-bold text-muted-foreground">
+                            R${payload[0].value}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                }
+                return null
+              }} />
             </AreaChart>
           </ChartContainer>
         </CardContent>
@@ -120,9 +137,25 @@ export function Dashboard() {
                 fill="#2563eb"
                 radius={[4, 4, 0, 0]}
               />
-              <ChartTooltip>
-                <ChartTooltipContent />
-              </ChartTooltip>
+              <Tooltip content={({ active, payload }) => {
+                if (active && payload && payload.length) {
+                  return (
+                    <div className="rounded-lg border bg-background p-2 shadow-sm">
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="flex flex-col">
+                          <span className="text-[0.70rem] uppercase text-muted-foreground">
+                            Total
+                          </span>
+                          <span className="font-bold text-muted-foreground">
+                            {payload[0].value}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                }
+                return null
+              }} />
             </BarChart>
           </ChartContainer>
         </CardContent>
