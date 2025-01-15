@@ -18,18 +18,8 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
-
-// Mock customer data
-const mockCustomers = [
-  {
-    id: "1",
-    name: "John Doe",
-    email: "john@example.com",
-    document: "123.456.789-00",
-    type: "customer",
-    status: true,
-  },
-];
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CustomerSelectorProps {
   selectedCustomer: any;
@@ -48,17 +38,39 @@ export const CustomerSelector = ({
   searchTerm,
   setSearchTerm,
 }: CustomerSelectorProps) => {
-  const filteredCustomers = mockCustomers.filter(
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .ilike("name", `%${searchTerm}%`);
+
+        if (error) throw error;
+        setCustomers(data || []);
+      } catch (error) {
+        console.error("Error fetching customers:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCustomers();
+  }, [searchTerm]);
+
+  const filteredCustomers = customers.filter(
     (customer) =>
-      customer.type === "customer" &&
-      (customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        customer.document.toLowerCase().includes(searchTerm.toLowerCase()))
+      customer.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customer.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <Dialog open={isCustomerDialogOpen} onOpenChange={setIsCustomerDialogOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">
+        <Button variant="outline" className="w-[200px]">
           {selectedCustomer ? (
             <>
               <span>{selectedCustomer.name}</span>
@@ -85,7 +97,7 @@ export const CustomerSelector = ({
         <div className="relative">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Buscar cliente por nome ou CPF/CNPJ..."
+            placeholder="Buscar cliente por nome ou email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-8"
@@ -96,30 +108,36 @@ export const CustomerSelector = ({
             <TableRow>
               <TableHead>Nome</TableHead>
               <TableHead>Email</TableHead>
-              <TableHead>CPF/CNPJ</TableHead>
-              <TableHead>Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredCustomers.map((customer) => (
-              <TableRow
-                key={customer.id}
-                className="cursor-pointer hover:bg-muted/50"
-                onClick={() => {
-                  setSelectedCustomer(customer);
-                  setIsCustomerDialogOpen(false);
-                }}
-              >
-                <TableCell>{customer.name}</TableCell>
-                <TableCell>{customer.email}</TableCell>
-                <TableCell>{customer.document}</TableCell>
-                <TableCell>
-                  <Badge variant={customer.status ? "default" : "destructive"}>
-                    {customer.status ? "Ativo" : "Inativo"}
-                  </Badge>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={2} className="text-center">
+                  Carregando...
                 </TableCell>
               </TableRow>
-            ))}
+            ) : filteredCustomers.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={2} className="text-center">
+                  Nenhum cliente encontrado
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredCustomers.map((customer) => (
+                <TableRow
+                  key={customer.id}
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => {
+                    setSelectedCustomer(customer);
+                    setIsCustomerDialogOpen(false);
+                  }}
+                >
+                  <TableCell>{customer.name}</TableCell>
+                  <TableCell>{customer.email}</TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </DialogContent>

@@ -1,21 +1,11 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Plus, Eye, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+import { Plus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { DataTable } from "./data-table";
+import { columns } from "./list-columns";
 import { Order } from "@/types/order";
-import { format, isToday } from "date-fns";
-import { useToast } from "@/components/ui/use-toast";
 
-// Mock data for example
 const mockOrders: Order[] = [
   {
     id: "1",
@@ -42,16 +32,7 @@ const mockOrders: Order[] = [
 
 export default function SalesListPage() {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [orders] = useState<Order[]>(mockOrders);
-
-  const handleDelete = (orderId: string) => {
-    // Aqui você implementaria a lógica de exclusão
-    toast({
-      title: "Venda excluída",
-      description: "A venda foi excluída com sucesso",
-    });
-  };
 
   return (
     <div className="container mx-auto py-10">
@@ -62,75 +43,7 @@ export default function SalesListPage() {
           Nova Venda
         </Button>
       </div>
-
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Fatura</TableHead>
-            <TableHead>Cliente</TableHead>
-            <TableHead>Valor</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Data</TableHead>
-            <TableHead>Ações</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {orders.map((order) => {
-            const orderDate = new Date(order.created_at);
-            const isCurrentDay = isToday(orderDate);
-
-            return (
-              <TableRow key={order.id}>
-                <TableCell>{order.invoice}</TableCell>
-                <TableCell>{order.customer?.name}</TableCell>
-                <TableCell>
-                  {order.amount?.toLocaleString("pt-BR", {
-                    style: "currency",
-                    currency: "BRL",
-                  })}
-                </TableCell>
-                <TableCell>
-                  <Badge variant={order.status ? "default" : "destructive"}>
-                    {order.status ? "Ativo" : "Inativo"}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  {format(orderDate, "dd/MM/yyyy")}
-                </TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => navigate(`/financial/sales/${order.id}`)}
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    {isCurrentDay && (
-                      <>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => navigate(`/financial/sales/${order.id}/edit`)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDelete(order.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
+      <DataTable columns={columns} data={orders} />
     </div>
   );
 }
