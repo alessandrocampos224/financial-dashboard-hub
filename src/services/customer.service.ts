@@ -1,6 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
 import { CustomerFormValues } from "@/pages/financial/customers/schema";
-import { toast } from "sonner";
 
 export const customerService = {
   async checkExistingUser(email: string) {
@@ -67,16 +66,17 @@ export const customerService = {
         throw new Error('Usuário não foi criado');
       }
 
-      // 2. Criar o perfil do cliente
+      // 2. Aguardar um momento para garantir que o trigger criou o perfil
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // 3. Atualizar o perfil do cliente com informações adicionais
       const profileData = {
-        id: authData.user.id,
         name: data.name,
         fantasia: data.fantasia,
         document: data.document,
         rg: data.rg,
         ie: data.ie,
         phone: data.phone,
-        email: data.email,
         type: 'customer',
         roles_id: roleId,
         tenant_id: tenantId,
@@ -84,25 +84,26 @@ export const customerService = {
         status: data.status,
       };
 
-      console.log('Dados do perfil a serem inseridos:', profileData);
+      console.log('Dados do perfil a serem atualizados:', profileData);
 
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .insert(profileData)
+        .update(profileData)
+        .eq('id', authData.user.id)
         .select()
         .single();
 
       if (profileError) {
-        console.error('Erro ao criar perfil:', profileError);
-        // Tentar remover o usuário auth se falhar ao criar o perfil
+        console.error('Erro ao atualizar perfil:', profileError);
+        // Tentar remover o usuário auth se falhar ao atualizar o perfil
         const { error: deleteError } = await supabase.auth.admin.deleteUser(authData.user.id);
         if (deleteError) {
-          console.error('Erro ao deletar usuário após falha na criação do perfil:', deleteError);
+          console.error('Erro ao deletar usuário após falha na atualização do perfil:', deleteError);
         }
         throw profileError;
       }
 
-      console.log('Perfil criado com sucesso:', profile);
+      console.log('Perfil atualizado com sucesso:', profile);
       return profile;
     } catch (error) {
       console.error('Erro completo:', error);
