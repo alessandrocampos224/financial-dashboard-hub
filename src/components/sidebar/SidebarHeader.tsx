@@ -17,19 +17,21 @@ export function SidebarHeader({ collapsed, setCollapsed }: SidebarHeaderProps) {
       >
         Sistema
       </h1>
-      <button
-        onClick={() => setCollapsed(!collapsed)}
-        className={cn(
-          "p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gdrive-hover transition-colors",
-          "flex items-center justify-center shrink-0"
-        )}
-      >
-        {collapsed ? (
-          <ChevronRight className="h-5 w-5 text-foreground" />
-        ) : (
-          <ChevronLeft className="h-5 w-5 text-foreground" />
-        )}
-      </button>
+      <div className="flex items-center justify-center">
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className={cn(
+            "p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gdrive-hover transition-colors",
+            "flex items-center justify-center"
+          )}
+        >
+          {collapsed ? (
+            <ChevronRight className="h-5 w-5 text-foreground" />
+          ) : (
+            <ChevronLeft className="h-5 w-5 text-foreground" />
+          )}
+        </button>
+      </div>
     </div>
   );
 }
