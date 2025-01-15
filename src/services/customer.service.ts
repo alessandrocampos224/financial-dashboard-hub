@@ -4,18 +4,27 @@ import { CustomerFormValues } from "@/pages/financial/customers/schema";
 export const customerService = {
   async checkExistingUser(email: string) {
     try {
-      // Usar maybeSingle() em vez de single() para evitar erro 406
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id, email')
-        .eq('email', email)
-        .maybeSingle();
+      // Primeiro, verificar na tabela auth.users
+      const { data: authData, error: authError } = await supabase.auth.admin.listUsers();
+      
+      if (authError) {
+        console.error('Erro ao verificar usuários existentes:', authError);
+        // Se não conseguir verificar no auth, tentar na tabela de profiles
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('id, email')
+          .eq('email', email)
+          .maybeSingle();
 
-      if (error) {
-        console.error('Erro ao verificar usuário existente:', error);
+        if (profileError) {
+          console.error('Erro ao verificar perfil existente:', profileError);
+        }
+        
+        return !!profileData;
       }
       
-      return !!data;
+      // Verificar se o email já existe em algum usuário
+      return authData.users.some(user => user.email === email);
     } catch (error) {
       console.error('Erro ao verificar usuário:', error);
       return false;
@@ -47,7 +56,7 @@ export const customerService = {
       console.log('Iniciando criação do cliente...');
       console.log('Dados do formulário:', data);
 
-      // 1. Verificar se o usuário já existe antes de tentar criar
+      // 1. Verificar se o usuário já existe
       const userExists = await this.checkExistingUser(data.email);
       if (userExists) {
         throw new Error('Um usuário com este email já existe no sistema.');
