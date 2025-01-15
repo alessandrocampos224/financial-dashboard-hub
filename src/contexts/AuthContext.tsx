@@ -1,68 +1,62 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
-
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-  avatar_url?: string;
-}
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { authService } from '../services/auth.service';
+import { toast } from 'sonner';
 
 interface AuthContextType {
-  user: User | null;
+  user: any | null;
+  loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
-  isAuthenticated: boolean;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const navigate = useNavigate();
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Verificar se existe um usuário no localStorage
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
+    checkAuth();
   }, []);
 
-  const login = async (email: string, password: string) => {
+  async function checkAuth() {
     try {
-      // Simulação de login - substituir por chamada real à API
-      if (email === "admin@example.com" && password === "password") {
-        const mockUser = {
-          id: 1,
-          name: "Administrador",
-          email: "admin@example.com",
-          role: "admin",
-        };
-        setUser(mockUser);
-        localStorage.setItem("user", JSON.stringify(mockUser));
-        toast.success("Login realizado com sucesso!");
-        navigate("/");
-      } else {
-        throw new Error("Credenciais inválidas");
+      if (localStorage.getItem('token')) {
+        const userData = await authService.getUser();
+        setUser(userData);
       }
     } catch (error) {
-      toast.error("Erro ao fazer login: " + (error as Error).message);
+      console.error('Erro ao verificar autenticação:', error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function login(email: string, password: string) {
+    try {
+      const response = await authService.login(email, password);
+      setUser(response.user);
+      toast.success('Login realizado com sucesso!');
+    } catch (error) {
+      console.error('Erro no login:', error);
+      toast.error('Erro ao realizar login. Verifique suas credenciais.');
       throw error;
     }
-  };
+  }
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("user");
-    toast.success("Logout realizado com sucesso!");
-    navigate("/login");
-  };
+  async function logout() {
+    try {
+      await authService.logout();
+      setUser(null);
+      toast.success('Logout realizado com sucesso!');
+    } catch (error) {
+      console.error('Erro no logout:', error);
+      toast.error('Erro ao realizar logout.');
+    }
+  }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
@@ -71,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error("useAuth deve ser usado dentro de um AuthProvider");
+    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
   }
   return context;
 }
