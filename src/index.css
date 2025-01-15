@@ -35,16 +35,16 @@
     --popover-foreground: 210 40% 98%;
     --primary: 217.2 91.2% 59.8%;
     --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: 220 20% 16%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
+    --muted: 220 20% 16%;
     --muted-foreground: 210 40% 90%;
-    --accent: 217.2 32.6% 17.5%;
+    --accent: 220 20% 16%;
     --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 20%;
-    --input: 217.2 32.6% 17.5%;
+    --border: 220 20% 20%;
+    --input: 220 20% 16%;
     --ring: 224.3 76.3% 48%;
   }
 }
@@ -88,11 +88,11 @@
   }
   
   .table-row {
-    @apply hover:bg-muted/50 dark:hover:bg-secondary/80 transition-colors;
+    @apply hover:bg-muted/50 dark:hover:bg-secondary/80 transition-colors border-b border-border dark:border-border/50;
   }
   
   .table-cell {
-    @apply p-4 align-middle [&:has([role=checkbox])]:pr-0 dark:text-foreground;
+    @apply p-4 align-middle [&:has([role=checkbox])]:pr-0 dark:text-foreground/90;
   }
 
   .dark .table-header th {
