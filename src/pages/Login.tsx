@@ -11,7 +11,16 @@ export default function Login() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    // Verifica se já existe uma sessão ativa
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        navigate("/");
+      }
+    });
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Login - Auth state changed:', event, session);
+      
       if (event === 'SIGNED_IN' && session) {
         navigate("/");
       }

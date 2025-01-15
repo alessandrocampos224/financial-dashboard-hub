@@ -39,28 +39,54 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   useEffect(() => {
-    // Verificar sessão atual
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session?.user) {
-        const profile = await getProfile(session.user.id);
-        setUser({ ...session.user, profile });
-      }
-      setLoading(false);
-    });
+    let mounted = true;
 
-    // Escutar mudanças na autenticação
+    async function initializeAuth() {
+      try {
+        // Primeiro, verifica se há uma sessão ativa
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error('Erro ao buscar sessão:', sessionError);
+          return;
+        }
+
+        if (session?.user && mounted) {
+          const profile = await getProfile(session.user.id);
+          setUser({ ...session.user, profile });
+        }
+      } catch (error) {
+        console.error('Erro na inicialização da autenticação:', error);
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    }
+
+    // Inicializa a autenticação
+    initializeAuth();
+
+    // Configura o listener para mudanças de estado
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state changed:', event);
-      if (session?.user) {
-        const profile = await getProfile(session.user.id);
-        setUser({ ...session.user, profile });
-      } else {
-        setUser(null);
+      console.log('Estado de autenticação alterado:', event);
+      
+      if (mounted) {
+        if (session?.user) {
+          const profile = await getProfile(session.user.id);
+          setUser({ ...session.user, profile });
+        } else {
+          setUser(null);
+        }
+        setLoading(false);
       }
-      setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    // Cleanup
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   async function logout() {
