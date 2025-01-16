@@ -36,7 +36,6 @@ export function useProducts() {
     mutationFn: async (product: Pick<Product, "code" | "name" | "price"> & Partial<Omit<Product, "code" | "name" | "price">>) => {
       console.log("Criando produto:", product);
       
-      // Remove category_id e brand_id se não forem UUIDs válidos
       const cleanProduct = {
         ...product,
         category_id: product.category_id && isValidUUID(product.category_id) ? product.category_id : undefined,
@@ -63,6 +62,40 @@ export function useProducts() {
     onError: (error: Error) => {
       console.error("Erro ao criar produto:", error);
       toast.error(`Erro ao criar produto: ${error.message}`);
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, ...product }: Product) => {
+      console.log("Atualizando produto:", { id, ...product });
+      
+      const cleanProduct = {
+        ...product,
+        category_id: product.category_id && isValidUUID(product.category_id) ? product.category_id : undefined,
+        brand_id: product.brand_id && isValidUUID(product.brand_id) ? product.brand_id : undefined,
+      };
+
+      const { data, error } = await supabase
+        .from("products")
+        .update(cleanProduct)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Erro ao atualizar produto:", error);
+        throw error;
+      }
+
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      toast.success("Produto atualizado com sucesso!");
+    },
+    onError: (error: Error) => {
+      console.error("Erro ao atualizar produto:", error);
+      toast.error(`Erro ao atualizar produto: ${error.message}`);
     },
   });
 
@@ -93,7 +126,9 @@ export function useProducts() {
     products,
     isLoading,
     createProduct: createMutation.mutate,
+    updateProduct: updateMutation.mutate,
     isCreatingProduct: createMutation.isPending,
+    isUpdatingProduct: updateMutation.isPending,
     deleteProduct: deleteMutation.mutate,
     isDeletingProduct: deleteMutation.isPending,
   };

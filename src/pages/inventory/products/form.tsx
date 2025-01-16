@@ -35,8 +35,8 @@ type FormValues = z.infer<typeof formSchema>;
 export default function ProductForm() {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { id } = useParams(); // Pega o ID da URL se estiver editando
-  const { createProduct, isCreatingProduct } = useProducts();
+  const { id } = useParams();
+  const { createProduct, updateProduct, isCreatingProduct, isUpdatingProduct } = useProducts();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -53,7 +53,6 @@ export default function ProductForm() {
     },
   });
 
-  // Carrega os dados do produto se estiver editando
   const { isLoading } = useQuery({
     queryKey: ["product", id],
     queryFn: async () => {
@@ -74,7 +73,6 @@ export default function ProductForm() {
         throw error;
       }
 
-      // Preenche o formulário com os dados do produto
       if (data) {
         form.reset({
           code: data.code,
@@ -91,22 +89,22 @@ export default function ProductForm() {
 
       return data;
     },
-    enabled: !!id, // Só executa se houver um ID
+    enabled: !!id,
   });
 
   const onSubmit = async (values: FormValues) => {
     try {
-      await createProduct({
-        code: values.code,
-        name: values.name,
-        price: values.price,
-        subtitle: values.subtitle,
-        category_id: values.category_id || undefined,
-        brand_id: values.brand_id || undefined,
-        stock: values.stock,
-        description: values.description,
-        status: values.status,
-      });
+      if (id) {
+        await updateProduct({
+          id,
+          ...values,
+          tenant_id: null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        });
+      } else {
+        await createProduct(values);
+      }
       navigate("/inventory/products");
     } catch (error) {
       console.error("Erro ao salvar produto:", error);
@@ -263,7 +261,7 @@ export default function ProductForm() {
             >
               Cancelar
             </Button>
-            <Button type="submit" disabled={isCreatingProduct}>
+            <Button type="submit" disabled={isCreatingProduct || isUpdatingProduct}>
               Salvar
             </Button>
           </div>

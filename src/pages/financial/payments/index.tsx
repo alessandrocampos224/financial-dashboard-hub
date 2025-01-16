@@ -15,7 +15,21 @@ export default function PaymentsPage() {
   const { data: payments = [] } = useQuery({
     queryKey: ["payments", user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Primeiro, busca todas as vendas que não têm pagamento
+      const { data: orders, error: ordersError } = await supabase
+        .from("orders")
+        .select(`
+          *,
+          customer:profiles(*)
+        `)
+        .eq("user_id", user?.id)
+        .eq("status", true)
+        .is("deleted_at", null);
+
+      if (ordersError) throw ordersError;
+
+      // Depois, busca os pagamentos existentes
+      const { data: existingPayments, error: paymentsError } = await supabase
         .from("payments")
         .select(`
           *,
@@ -27,12 +41,24 @@ export default function PaymentsPage() {
         .eq("user_id", user?.id)
         .order("created_at", { ascending: false });
 
-      if (error) {
-        console.error("Erro ao buscar pagamentos:", error);
-        throw error;
-      }
+      if (paymentsError) throw paymentsError;
 
-      return data || [];
+      // Cria pagamentos pendentes para vendas sem pagamento
+      const pendingPayments = orders
+        ?.filter(order => !existingPayments?.some(payment => payment.order_id === order.id))
+        .map(order => ({
+          id: `pending-${order.id}`,
+          order_id: order.id,
+          amount: order.amount,
+          status: false,
+          created_at: order.created_at,
+          order: {
+            ...order,
+            customer: order.customer
+          }
+        }));
+
+      return [...(existingPayments || []), ...(pendingPayments || [])];
     },
     enabled: !!user?.id,
   });
