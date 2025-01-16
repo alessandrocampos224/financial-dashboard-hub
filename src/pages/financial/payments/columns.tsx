@@ -61,11 +61,11 @@ export const columns: ColumnDef<Payment>[] = [
       const isToday = new Date(payment.created_at).toDateString() === new Date().toDateString();
       const status = payment.status;
 
-      let variant = "default";
-      let label = "Pendente";
+      let variant = "secondary";
+      let label = "Em Aberto";
 
       if (status === true) {
-        variant = "success";
+        variant = "default";
         label = "Pago";
       } else if (status === false) {
         variant = "destructive";

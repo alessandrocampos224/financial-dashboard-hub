@@ -48,7 +48,7 @@ export default function PaymentsPage() {
       const pendingPayments: Payment[] = orders
         ?.filter(order => !existingPayments?.some(payment => payment.order_id === order.id))
         .map(order => ({
-          id: crypto.randomUUID(), // Usando UUID válido em vez de string com prefixo
+          id: crypto.randomUUID(),
           tenant_id: order.tenant_id || "",
           safe_id: "",
           user_id: user?.id || "",
@@ -79,9 +79,9 @@ export default function PaymentsPage() {
     <div className="container mx-auto py-10">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Pagamentos</h1>
-        <Button onClick={() => navigate("/financial/sales")}>
+        <Button onClick={() => navigate("/financial/payments/new")}>
           <Plus className="mr-2 h-4 w-4" />
-          Nova Venda
+          Novo Pagamento
         </Button>
       </div>
       <DataTable columns={columns} data={payments} />
