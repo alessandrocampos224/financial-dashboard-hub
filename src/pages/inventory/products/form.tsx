@@ -13,8 +13,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useProducts } from "@/hooks/useProducts";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const formSchema = z.object({
   code: z.string().min(1, "Código é obrigatório"),
@@ -33,6 +35,7 @@ type FormValues = z.infer<typeof formSchema>;
 export default function ProductForm() {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { id } = useParams(); // Pega o ID da URL se estiver editando
   const { createProduct, isCreatingProduct } = useProducts();
 
   const form = useForm<FormValues>({
@@ -48,6 +51,47 @@ export default function ProductForm() {
       description: "",
       status: true,
     },
+  });
+
+  // Carrega os dados do produto se estiver editando
+  const { isLoading } = useQuery({
+    queryKey: ["product", id],
+    queryFn: async () => {
+      if (!id) return null;
+
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Erro!",
+          description: "Erro ao carregar dados do produto.",
+        });
+        throw error;
+      }
+
+      // Preenche o formulário com os dados do produto
+      if (data) {
+        form.reset({
+          code: data.code,
+          name: data.name,
+          subtitle: data.subtitle || "",
+          category_id: data.category_id || "",
+          brand_id: data.brand_id || "",
+          price: data.price,
+          stock: data.stock || 0,
+          description: data.description || "",
+          status: data.status,
+        });
+      }
+
+      return data;
+    },
+    enabled: !!id, // Só executa se houver um ID
   });
 
   const onSubmit = async (values: FormValues) => {
@@ -74,9 +118,13 @@ export default function ProductForm() {
     }
   };
 
+  if (isLoading) {
+    return <div>Carregando...</div>;
+  }
+
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Novo Produto</h1>
+      <h1 className="text-2xl font-bold mb-6">{id ? "Editar" : "Novo"} Produto</h1>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">

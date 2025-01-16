@@ -14,6 +14,29 @@ export default function CashierPage() {
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useAuth();
 
+  // Busca o saldo do dia anterior
+  const { data: previousSafe } = useQuery({
+    queryKey: ["safe", "previous"],
+    queryFn: async () => {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayStart = yesterday.toISOString().split('T')[0];
+      const yesterdayEnd = yesterdayStart + "T23:59:59.999Z";
+
+      const { data, error } = await supabase
+        .from("safes")
+        .select("*")
+        .gte("created_at", yesterdayStart)
+        .lte("created_at", yesterdayEnd)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single();
+
+      if (error && error.code !== 'PGRST116') throw error;
+      return data;
+    },
+  });
+
   const { data: currentSafe } = useQuery({
     queryKey: ["safe", "current"],
     queryFn: async () => {
@@ -28,12 +51,15 @@ export default function CashierPage() {
 
       if (error) {
         if (error.code === 'PGRST116') {
-          // Nenhum caixa encontrado para hoje, criar um novo
+          // Nenhum caixa encontrado para hoje, criar um novo com o saldo anterior
+          const initialAmount = previousSafe?.amount || 0;
+          
           const { data: newSafe, error: createError } = await supabase
             .from("safes")
             .insert({
               description: `Caixa do dia ${format(new Date(), "dd/MM/yyyy")}`,
               status: true,
+              amount: initialAmount, // Inicializa com o saldo anterior
             })
             .select()
             .single();
@@ -46,6 +72,7 @@ export default function CashierPage() {
 
       return data;
     },
+    enabled: !!previousSafe || previousSafe === null, // Executa após buscar o saldo anterior
   });
 
   const { data: payments } = useQuery({
