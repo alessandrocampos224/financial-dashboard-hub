@@ -7,6 +7,7 @@ import { columns } from "./columns";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { Payment } from "@/types/payment";
 
 export default function PaymentsPage() {
   const navigate = useNavigate();
@@ -44,21 +45,32 @@ export default function PaymentsPage() {
       if (paymentsError) throw paymentsError;
 
       // Cria pagamentos pendentes para vendas sem pagamento
-      const pendingPayments = orders
+      const pendingPayments: Payment[] = orders
         ?.filter(order => !existingPayments?.some(payment => payment.order_id === order.id))
         .map(order => ({
           id: `pending-${order.id}`,
+          tenant_id: order.tenant_id || "",
+          safe_id: "",
+          user_id: user?.id || "",
           order_id: order.id,
-          amount: order.amount,
+          parcela: 1,
+          amount: order.amount || 0,
+          discount: 0,
+          affix: 0,
+          price: order.price || 0,
+          description: "",
+          number: "",
           status: false,
           created_at: order.created_at,
+          updated_at: order.updated_at,
+          deleted_at: null,
           order: {
-            ...order,
-            customer: order.customer
+            customer: order.customer,
+            invoice: order.invoice
           }
         }));
 
-      return [...(existingPayments || []), ...(pendingPayments || [])];
+      return [...(existingPayments || []), ...(pendingPayments || [])] as Payment[];
     },
     enabled: !!user?.id,
   });

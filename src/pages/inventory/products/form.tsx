@@ -97,13 +97,31 @@ export default function ProductForm() {
       if (id) {
         await updateProduct({
           id,
-          ...values,
+          code: values.code,
+          name: values.name,
+          subtitle: values.subtitle,
+          category_id: values.category_id,
+          brand_id: values.brand_id,
+          price: values.price,
+          stock: values.stock,
+          description: values.description,
+          status: values.status,
           tenant_id: null,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         });
       } else {
-        await createProduct(values);
+        await createProduct({
+          code: values.code,
+          name: values.name,
+          subtitle: values.subtitle,
+          category_id: values.category_id,
+          brand_id: values.brand_id,
+          price: values.price,
+          stock: values.stock,
+          description: values.description,
+          status: values.status,
+        });
       }
       navigate("/inventory/products");
     } catch (error) {
