@@ -48,7 +48,7 @@ export default function PaymentsPage() {
       const pendingPayments: Payment[] = orders
         ?.filter(order => !existingPayments?.some(payment => payment.order_id === order.id))
         .map(order => ({
-          id: `pending-${order.id}`,
+          id: crypto.randomUUID(), // Usando UUID válido em vez de string com prefixo
           tenant_id: order.tenant_id || "",
           safe_id: "",
           user_id: user?.id || "",
