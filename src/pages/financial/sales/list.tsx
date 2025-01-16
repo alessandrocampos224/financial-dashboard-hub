@@ -18,7 +18,8 @@ export default function SalesListPage() {
         .from("orders")
         .select(`
           *,
-          customer:profiles!orders_customer_id_fkey (
+          customer:profiles (
+            id,
             name,
             email
           )
